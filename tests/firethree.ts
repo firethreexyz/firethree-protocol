@@ -1,50 +1,66 @@
+import { PublicKey } from "@solana/web3.js";
+import { Firethree } from "../target/types/firethree";
+import { encodeName, decodeName } from "../sdk/src/utils/name";
+import * as anchor from "@coral-xyz/anchor";
+import IDL from "../sdk/src/idl/firethree.json";
+import { expect } from "chai";
 
-describe("Test", () => {
-  it("initialize", async () => {
-    // Send transaction
+describe("Firethree", () => {
+  const provider = anchor.AnchorProvider.local(
+    "https://api.devnet.solana.com",
+    {
+      preflightCommitment: "confirmed",
+      skipPreflight: false,
+      commitment: "confirmed",
+    }
+  );
 
-    const program = anchor.workspace.Firethree;
-    const [ProjectPDA] = web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("project"), Buffer.from(encodeName("Slide v2"))],
+  const program = new anchor.Program<Firethree>(
+    IDL as Firethree,
+    "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD",
+    provider
+  );
+
+  anchor.setProvider(provider);
+
+  it("Should able to create a project", async () => {
+    const name = encodeName("Slide v5");
+
+    const [ProjectPDA] = PublicKey.findProgramAddressSync(
+      [Buffer.from("project"), Buffer.from(name)],
       program.programId
     );
 
-    await pg.program.methods
+    await program.methods
       .setupProject({
-        name: encodeName("Slide v2"),
+        name,
+        shdw: new PublicKey("HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq"),
       })
       .accounts({
-        user: pg.wallet.publicKey,
+        user: provider.wallet.publicKey,
         project: ProjectPDA,
       })
-      .rpc({
-        commitment: "confirmed",
-      });
+      .rpc();
 
     const firethree = await program.account.project.fetch(ProjectPDA);
 
     console.log("On-chain data is:", firethree);
 
-    // // Check whether the data on-chain is equal to local 'data'
-    // assert(data.eq(newAccount.data));
+    expect(decodeName(firethree.name)).equal(decodeName(name));
+  });
+
+  it("Should able to get a project", async () => {
+    const name = encodeName("Slide v5");
+
+    const [ProjectPDA] = PublicKey.findProgramAddressSync(
+      [Buffer.from("project"), Buffer.from(name)],
+      program.programId
+    );
+
+    const firethree = await program.account.project.fetch(ProjectPDA);
+
+    console.log("On-chain data is:", firethree);
+
+    expect(decodeName(firethree.name)).equal(decodeName(name));
   });
 });
-
-const MAX_NAME_LENGTH = 32;
-
-function encodeName(name: string): number[] {
-  if (name.length > MAX_NAME_LENGTH) {
-    throw Error(`Name (${name}) longer than 32 characters`);
-  }
-
-  const buffer = Buffer.alloc(32);
-  buffer.fill(name);
-  buffer.fill(" ", name.length);
-
-  return Array(...buffer);
-}
-
-function decodeName(bytes: number[]): string {
-  const buffer = Buffer.from(bytes);
-  return buffer.toString("utf8").trim();
-}
