@@ -1,59 +1,60 @@
 {
- "name": "@firethreexyz/firethree-protocol",
- "version": "0.0.1",
- "description": "The official firethree. Create your own solona on-chain collection, storage, analytics with this protocol.",
- "main": "./dist/index.js",
- "module": "./dist/index.js",
- "types": "./dist/index.d.ts",
- "scripts": {
-   "build": "tsc",
-   "clean": "rimraf dist",
-   "prebuild": "yarn clean",
-   "prepublishOnly": "yarn build",
-   "docs": "typedoc --excludePrivate --includeVersion --out ./docs src"
- },
- "repository": {
-   "type": "git",
-   "url": "https://github.com/firethreexyz/firethree-protocol"
- },
- "publishConfig": {
-   "access": "public"
- },
- "exports": {
-   ".": "./dist/index.js"
- },
- "files": [
-   "dist/**/*"
- ],
- "keywords": [
-   "solana",
-   "blockchain",
-   "protocol",
-   "firethree",
-   "web3 collection",
-   "web3 storage",
-   "web3 analytics",
-   "web3 hosting"
- ],
- "author": "Firethree",
- "license": "MIT",
- "bugs": {
-   "url": "https://github.com/firethreexyz/firethree-protocol/issues"
- },
- "homepage": "https://firethree.xyz",
- "devDependencies": {
-   "@typescript-eslint/eslint-plugin": "6.7.3",
-   "@typescript-eslint/parser": "6.7.3",
-   "eslint": "8.50.0",
-   "eslint-config-prettier": "9.0.0",
-   "eslint-plugin-prettier": "5.0.0",
-   "prettier": "3.0.3",
-   "typedoc": "0.25.1",
-   "typescript": "5.2.2"
- },
- "dependencies": {
-   "@project-serum/anchor": "0.26.0",
-   "@shadow-drive/sdk": "5.0.0",
-   "bs58": "5.0.0"
- }
+  "name": "@firethreexyz/firethree-protocol",
+  "version": "0.0.1",
+  "description": "The official firethree. Create your own solona on-chain collection, storage, analytics with this protocol.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "prebuild": "yarn clean",
+    "prepublishOnly": "yarn build",
+    "docs": "typedoc --excludePrivate --includeVersion --out ./docs src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firethreexyz/firethree-protocol"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "keywords": [
+    "solana",
+    "blockchain",
+    "protocol",
+    "firethree",
+    "web3 collection",
+    "web3 storage",
+    "web3 analytics",
+    "web3 hosting"
+  ],
+  "author": "Firethree",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/firethreexyz/firethree-protocol/issues"
+  },
+  "homepage": "https://firethree.xyz",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "6.7.3",
+    "@typescript-eslint/parser": "6.7.3",
+    "eslint": "8.50.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "prettier": "3.0.3",
+    "typedoc": "0.25.1",
+    "typescript": "5.2.2"
+  },
+  "dependencies": {
+    "@project-serum/anchor": "0.26.0",
+    "@shadow-drive/sdk": "5.0.0",
+    "@sqds/multisig": "^1.10.0",
+    "bs58": "5.0.0"
+  }
 }
