@@ -38,7 +38,7 @@ describe("Firethree", () => {
         multisigKey,
       })
       .accounts({
-        user: provider.wallet.publicKey,
+        payer: provider.wallet.publicKey,
         project: ProjectPDA,
       })
       .rpc();
@@ -74,7 +74,7 @@ describe("Firethree", () => {
       await program.methods
         .deleteProject()
         .accounts({
-          user: provider.wallet.publicKey,
+          payer: provider.wallet.publicKey,
           project: ProjectPDA,
         })
         .rpc();

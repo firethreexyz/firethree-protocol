@@ -6,7 +6,7 @@
       "name": "setupProject",
       "accounts": [
         {
-          "name": "user",
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -31,10 +31,36 @@
       ]
     },
     {
+      "name": "createUser",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "deleteProject",
       "accounts": [
         {
-          "name": "user",
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -92,6 +118,26 @@
           }
         ]
       }
+    },
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "pubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -100,8 +146,5 @@
       "name": "Unauthorized",
       "msg": "Unauthorized"
     }
-  ],
-  "metadata": {
-    "address": "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD"
-  }
+  ]
 }

@@ -6,7 +6,7 @@ export type Firethree = {
       name: 'setupProject'
       accounts: [
         {
-          name: 'user'
+          name: 'payer'
           isMut: true
           isSigner: true
         },
@@ -31,10 +31,36 @@ export type Firethree = {
       ]
     },
     {
+      name: 'createUser'
+      accounts: [
+        {
+          name: 'payer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'user'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'systemProgram'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'project'
+          isMut: true
+          isSigner: false
+        }
+      ]
+      args: []
+    },
+    {
       name: 'deleteProject'
       accounts: [
         {
-          name: 'user'
+          name: 'payer'
           isMut: true
           isSigner: true
         },
@@ -89,6 +115,26 @@ export type Firethree = {
           }
         ]
       }
+    },
+    {
+      name: 'user'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'ts'
+            type: 'i64'
+          },
+          {
+            name: 'pubkey'
+            type: 'publicKey'
+          },
+          {
+            name: 'bump'
+            type: 'u8'
+          }
+        ]
+      }
     }
   ]
   errors: [
@@ -108,7 +154,7 @@ export const IDL: Firethree = {
       name: 'setupProject',
       accounts: [
         {
-          name: 'user',
+          name: 'payer',
           isMut: true,
           isSigner: true
         },
@@ -133,10 +179,36 @@ export const IDL: Firethree = {
       ]
     },
     {
+      name: 'createUser',
+      accounts: [
+        {
+          name: 'payer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'user',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'project',
+          isMut: true,
+          isSigner: false
+        }
+      ],
+      args: []
+    },
+    {
       name: 'deleteProject',
       accounts: [
         {
-          name: 'user',
+          name: 'payer',
           isMut: true,
           isSigner: true
         },
@@ -188,6 +260,26 @@ export const IDL: Firethree = {
           {
             name: 'authority',
             type: 'publicKey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'user',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'ts',
+            type: 'i64'
+          },
+          {
+            name: 'pubkey',
+            type: 'publicKey'
+          },
+          {
+            name: 'bump',
+            type: 'u8'
           }
         ]
       }

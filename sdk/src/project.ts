@@ -109,7 +109,7 @@ export default class Poject {
         multisigKey: MultisigPda
       })
       .accounts({
-        user: this.provider.wallet.publicKey,
+        payer: this.provider.wallet.publicKey,
         project: ProjectPDA
       })
       .instruction()

@@ -18,7 +18,7 @@ pub mod firethree {
         project.users = 0;
         project.bump = *ctx.bumps.get("project").unwrap();
         project.pubkey = *project.to_account_info().key;
-        project.authority = *ctx.accounts.user.key;
+        project.authority = *ctx.accounts.payer.key;
 
         let clock: Clock = Clock::get().unwrap();
         project.ts = clock.unix_timestamp;
@@ -26,10 +26,22 @@ pub mod firethree {
         Ok(())
     }
 
+    pub fn create_user(ctx: Context<CreateUser>) -> Result<()> {
+        let project: &mut Account<Project> = &mut ctx.accounts.project;
+        let user: &mut Account<User> = &mut ctx.accounts.user;
+
+        user.pubkey = *user.to_account_info().key;
+        user.bump = *ctx.bumps.get("user").unwrap();
+
+        project.users += 1;
+
+        Ok(())
+    }
+
     pub fn delete_project(ctx: Context<DeleteProject>) -> Result<()> {
         let project: &mut Account<Project> = &mut ctx.accounts.project;
 
-        if project.authority != *ctx.accounts.user.key {
+        if project.authority != *ctx.accounts.payer.key {
             return Err(ErrorCode::Unauthorized.into());
         }
 
@@ -49,12 +61,19 @@ pub struct Project {
     pub authority: Pubkey,
 }
 
+#[account]
+pub struct User {
+    pub ts: i64, // timestamp
+    pub pubkey: Pubkey,
+    pub bump: u8,
+}
+
 #[derive(Accounts)]
 #[instruction(args: Project)]
 pub struct SetupProject<'info> {
     #[account(mut)]
-    pub user: Signer<'info>,
-    #[account(init, payer = user, space = 8 + mem::size_of::<Project>(), seeds = [b"project", args.name.as_ref()], bump)]
+    pub payer: Signer<'info>,
+    #[account(init, payer = payer, space = 8 + mem::size_of::<Project>(), seeds = [b"project", args.name.as_ref()], bump)]
     pub project: Account<'info, Project>,
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
@@ -63,8 +82,20 @@ pub struct SetupProject<'info> {
 #[derive(Accounts)]
 pub struct DeleteProject<'info> {
     #[account(mut)]
-    pub user: Signer<'info>,
-    #[account(mut, close = user)]
+    pub payer: Signer<'info>,
+    #[account(mut, close = payer)]
+    pub project: Account<'info, Project>,
+}
+
+#[derive(Accounts)]
+pub struct CreateUser<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    #[account(init, payer = payer, space = 8 + mem::size_of::<User>(), seeds = [b"user", project.name.as_ref(), user.key().as_ref()], bump)]
+    pub user: Account<'info, User>,
+    #[account(address = system_program::ID)]
+    pub system_program: Program<'info, System>,
+    #[account(mut)]
     pub project: Account<'info, Project>,
 }
 
