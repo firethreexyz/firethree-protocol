@@ -2,14 +2,14 @@
 seeds = false
 skip-lint = false
 
-[programs.localnet]
-firethree = "Db7ew4s7tfe5czhdeUmTGmVnGnKx4LVHq1fjRVXP6Lr"
+[programs.devnet]
+firethree = "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD"
 
 [registry]
-url = "https://api.apr.dev"
+url = "https://api.devnet.solana.com"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "/Users/dannpl/.config/solana/id.json"
 
 [scripts]

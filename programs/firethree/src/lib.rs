@@ -9,11 +9,12 @@ declare_id!("CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD");
 pub mod firethree {
     use super::*;
 
-    pub fn setup_project(ctx: Context<SetupProject>, params: Project) -> Result<()> {
+    pub fn setup_project(ctx: Context<SetupProject>, args: Project) -> Result<()> {
         let project: &mut Account<Project> = &mut ctx.accounts.project;
 
-        project.name = params.name;
-        project.shdw = params.shdw;
+        project.name = args.name;
+        project.shdw = args.shdw;
+        project.multisig_key = args.multisig_key;
         project.users = 0;
         project.bump = *ctx.bumps.get("project").unwrap();
         project.pubkey = *project.to_account_info().key;
@@ -43,6 +44,7 @@ pub struct Project {
     pub users: u32,
     pub bump: u8,
     pub shdw: Pubkey,
+    pub multisig_key: Pubkey,
 }
 
 #[account]
@@ -55,11 +57,11 @@ pub struct User {
 }
 
 #[derive(Accounts)]
-#[instruction(params: Project)]
+#[instruction(args: Project)]
 pub struct SetupProject<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
-    #[account(init, payer = user, space = 8 + mem::size_of::<Project>(), seeds = [b"project", params.name.as_ref()], bump)]
+    #[account(init, payer = user, space = 8 + mem::size_of::<Project>(), seeds = [b"project", args.name.as_ref()], bump)]
     pub project: Account<'info, Project>,
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,

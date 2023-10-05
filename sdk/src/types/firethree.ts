@@ -19,7 +19,7 @@ export type Firethree = {
           name: 'systemProgram'
           isMut: false
           isSigner: false
-        },
+        }
       ]
       args: [
         {
@@ -27,9 +27,9 @@ export type Firethree = {
           type: {
             defined: 'Project'
           }
-        },
+        }
       ]
-    },
+    }
   ]
   accounts: [
     {
@@ -63,6 +63,14 @@ export type Firethree = {
             name: 'shdw'
             type: 'publicKey'
           },
+          {
+            name: 'vault'
+            type: 'publicKey'
+          },
+          {
+            name: 'isOnchain'
+            type: 'bool'
+          }
         ]
       }
     },
@@ -92,10 +100,10 @@ export type Firethree = {
           {
             name: 'project'
             type: 'publicKey'
-          },
+          }
         ]
       }
-    },
+    }
   ]
 }
 
@@ -109,28 +117,28 @@ export const IDL: Firethree = {
         {
           name: 'user',
           isMut: true,
-          isSigner: true,
+          isSigner: true
         },
         {
           name: 'project',
           isMut: true,
-          isSigner: false,
+          isSigner: false
         },
         {
           name: 'systemProgram',
           isMut: false,
-          isSigner: false,
-        },
+          isSigner: false
+        }
       ],
       args: [
         {
           name: 'params',
           type: {
-            defined: 'Project',
-          },
-        },
-      ],
-    },
+            defined: 'Project'
+          }
+        }
+      ]
+    }
   ],
   accounts: [
     {
@@ -140,32 +148,40 @@ export const IDL: Firethree = {
         fields: [
           {
             name: 'ts',
-            type: 'i64',
+            type: 'i64'
           },
           {
             name: 'name',
             type: {
-              array: ['u8', 32],
-            },
+              array: ['u8', 32]
+            }
           },
           {
             name: 'pubkey',
-            type: 'publicKey',
+            type: 'publicKey'
           },
           {
             name: 'users',
-            type: 'u32',
+            type: 'u32'
           },
           {
             name: 'bump',
-            type: 'u8',
+            type: 'u8'
           },
           {
             name: 'shdw',
-            type: 'publicKey',
+            type: 'publicKey'
           },
-        ],
-      },
+          {
+            name: 'vault',
+            type: 'publicKey'
+          },
+          {
+            name: 'isOnchain',
+            type: 'bool'
+          }
+        ]
+      }
     },
     {
       name: 'user',
@@ -174,28 +190,28 @@ export const IDL: Firethree = {
         fields: [
           {
             name: 'ts',
-            type: 'i64',
+            type: 'i64'
           },
           {
             name: 'pubkey',
-            type: 'publicKey',
+            type: 'publicKey'
           },
           {
             name: 'nick',
             type: {
-              array: ['u8', 32],
-            },
+              array: ['u8', 32]
+            }
           },
           {
             name: 'bump',
-            type: 'u8',
+            type: 'u8'
           },
           {
             name: 'project',
-            type: 'publicKey',
-          },
-        ],
-      },
-    },
-  ],
+            type: 'publicKey'
+          }
+        ]
+      }
+    }
+  ]
 }

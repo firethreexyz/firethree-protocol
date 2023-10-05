@@ -65,6 +65,14 @@
           {
             "name": "shdw",
             "type": "publicKey"
+          },
+          {
+            "name": "vault",
+            "type": "publicKey"
+          },
+          {
+            "name": "isOnchain",
+            "type": "bool"
           }
         ]
       }

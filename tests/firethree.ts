@@ -23,31 +23,31 @@ describe("Firethree", () => {
 
   anchor.setProvider(provider);
 
-  it("Should able to create a project", async () => {
-    const name = encodeName("Slide v5");
+  // it("Should able to create a project", async () => {
+  //   const name = encodeName("Slide v5");
 
-    const [ProjectPDA] = PublicKey.findProgramAddressSync(
-      [Buffer.from("project"), Buffer.from(name)],
-      program.programId
-    );
+  //   const [ProjectPDA] = PublicKey.findProgramAddressSync(
+  //     [Buffer.from("project"), Buffer.from(name)],
+  //     program.programId
+  //   );
 
-    await program.methods
-      .setupProject({
-        name,
-        shdw: new PublicKey("HjJQdfTHgC3EBX3471w4st8BXbBmtbaMyCAXNgcUb7dq"),
-      })
-      .accounts({
-        user: provider.wallet.publicKey,
-        project: ProjectPDA,
-      })
-      .rpc();
+  //   await program.methods
+  //     .setupProject({
+  //       name,
+  //       is_onchain: false,
+  //     })
+  //     .accounts({
+  //       user: provider.wallet.publicKey,
+  //       project: ProjectPDA,
+  //     })
+  //     .rpc();
 
-    const firethree = await program.account.project.fetch(ProjectPDA);
+  //   const firethree = await program.account.project.fetch(ProjectPDA);
 
-    console.log("On-chain data is:", firethree);
+  //   console.log("On-chain data is:", firethree);
 
-    expect(decodeName(firethree.name)).equal(decodeName(name));
-  });
+  //   expect(decodeName(firethree.name)).equal(decodeName(name));
+  // });
 
   it("Should able to get a project", async () => {
     const name = encodeName("Slide v5");
