@@ -7,8 +7,7 @@ import {
   VersionedTransaction
 } from '@solana/web3.js'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
-import IDL from './idl/firethree.json'
-import { Firethree } from './types/firethree'
+import { Firethree, IDL } from './types/firethree'
 import { FIRETHREE_PROGRAM_ID } from './constants/program'
 import { encodeName } from './utils/name'
 import * as multisig from '@sqds/multisig'
@@ -27,7 +26,7 @@ export default class Poject {
     this.opts = opts || AnchorProvider.defaultOptions()
     this.provider = new AnchorProvider(this.connection, this.wallet, this.opts)
     this.program = new Program<Firethree>(
-      IDL as Firethree,
+      IDL,
       FIRETHREE_PROGRAM_ID,
       this.provider
     )
