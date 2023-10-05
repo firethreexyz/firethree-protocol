@@ -3,7 +3,7 @@ export type Firethree = {
   name: 'firethree'
   instructions: [
     {
-      name: 'setupProject'
+      name: 'projectCreate'
       accounts: [
         {
           name: 'payer'
@@ -31,7 +31,23 @@ export type Firethree = {
       ]
     },
     {
-      name: 'createUser'
+      name: 'projectDelete'
+      accounts: [
+        {
+          name: 'payer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'project'
+          isMut: true
+          isSigner: false
+        }
+      ]
+      args: []
+    },
+    {
+      name: 'userCreate'
       accounts: [
         {
           name: 'payer'
@@ -44,29 +60,13 @@ export type Firethree = {
           isSigner: false
         },
         {
+          name: 'project'
+          isMut: true
+          isSigner: false
+        },
+        {
           name: 'systemProgram'
           isMut: false
-          isSigner: false
-        },
-        {
-          name: 'project'
-          isMut: true
-          isSigner: false
-        }
-      ]
-      args: []
-    },
-    {
-      name: 'deleteProject'
-      accounts: [
-        {
-          name: 'payer'
-          isMut: true
-          isSigner: true
-        },
-        {
-          name: 'project'
-          isMut: true
           isSigner: false
         }
       ]
@@ -130,6 +130,10 @@ export type Firethree = {
             type: 'publicKey'
           },
           {
+            name: 'authority'
+            type: 'publicKey'
+          },
+          {
             name: 'bump'
             type: 'u8'
           }
@@ -140,8 +144,8 @@ export type Firethree = {
   errors: [
     {
       code: 6000
-      name: 'Unauthorized'
-      msg: 'Unauthorized'
+      name: 'UnauthorizedToDeleteProject'
+      msg: 'Unauthorized to delete the project'
     }
   ]
 }
@@ -151,7 +155,7 @@ export const IDL: Firethree = {
   name: 'firethree',
   instructions: [
     {
-      name: 'setupProject',
+      name: 'projectCreate',
       accounts: [
         {
           name: 'payer',
@@ -179,7 +183,23 @@ export const IDL: Firethree = {
       ]
     },
     {
-      name: 'createUser',
+      name: 'projectDelete',
+      accounts: [
+        {
+          name: 'payer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'project',
+          isMut: true,
+          isSigner: false
+        }
+      ],
+      args: []
+    },
+    {
+      name: 'userCreate',
       accounts: [
         {
           name: 'payer',
@@ -192,29 +212,13 @@ export const IDL: Firethree = {
           isSigner: false
         },
         {
+          name: 'project',
+          isMut: true,
+          isSigner: false
+        },
+        {
           name: 'systemProgram',
           isMut: false,
-          isSigner: false
-        },
-        {
-          name: 'project',
-          isMut: true,
-          isSigner: false
-        }
-      ],
-      args: []
-    },
-    {
-      name: 'deleteProject',
-      accounts: [
-        {
-          name: 'payer',
-          isMut: true,
-          isSigner: true
-        },
-        {
-          name: 'project',
-          isMut: true,
           isSigner: false
         }
       ],
@@ -278,6 +282,10 @@ export const IDL: Firethree = {
             type: 'publicKey'
           },
           {
+            name: 'authority',
+            type: 'publicKey'
+          },
+          {
             name: 'bump',
             type: 'u8'
           }
@@ -288,8 +296,8 @@ export const IDL: Firethree = {
   errors: [
     {
       code: 6000,
-      name: 'Unauthorized',
-      msg: 'Unauthorized'
+      name: 'UnauthorizedToDeleteProject',
+      msg: 'Unauthorized to delete the project'
     }
   ]
 }

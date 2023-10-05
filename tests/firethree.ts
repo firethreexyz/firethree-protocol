@@ -33,7 +33,7 @@ describe("Firethree", () => {
     const multisigKey = Keypair.generate().publicKey;
 
     await program.methods
-      .setupProject({
+      .projectCreate({
         name,
         multisigKey,
       })
@@ -72,7 +72,7 @@ describe("Firethree", () => {
     let firethree;
     try {
       await program.methods
-        .deleteProject()
+        .projectDelete()
         .accounts({
           payer: provider.wallet.publicKey,
           project: ProjectPDA,

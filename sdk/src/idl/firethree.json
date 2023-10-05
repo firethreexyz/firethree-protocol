@@ -3,7 +3,7 @@
   "name": "firethree",
   "instructions": [
     {
-      "name": "setupProject",
+      "name": "projectCreate",
       "accounts": [
         {
           "name": "payer",
@@ -31,7 +31,23 @@
       ]
     },
     {
-      "name": "createUser",
+      "name": "projectDelete",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "userCreate",
       "accounts": [
         {
           "name": "payer",
@@ -44,29 +60,13 @@
           "isSigner": false
         },
         {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "project",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "deleteProject",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "project",
-          "isMut": true,
           "isSigner": false
         }
       ],
@@ -133,6 +133,10 @@
             "type": "publicKey"
           },
           {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
             "name": "bump",
             "type": "u8"
           }
@@ -143,8 +147,11 @@
   "errors": [
     {
       "code": 6000,
-      "name": "Unauthorized",
-      "msg": "Unauthorized"
+      "name": "UnauthorizedToDeleteProject",
+      "msg": "Unauthorized to delete the project"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD"
+  }
 }

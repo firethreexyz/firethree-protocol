@@ -104,7 +104,7 @@ export default class Poject {
     )
 
     const setupProjectIx = await this.program.methods
-      .setupProject({
+      .projectCreate({
         name,
         multisigKey: MultisigPda
       })
