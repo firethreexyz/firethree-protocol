@@ -23,12 +23,28 @@
       ],
       "args": [
         {
-          "name": "params",
+          "name": "args",
           "type": {
             "defined": "Project"
           }
         }
       ]
+    },
+    {
+      "name": "deleteProject",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "project",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -67,48 +83,25 @@
             "type": "publicKey"
           },
           {
-            "name": "vault",
+            "name": "multisigKey",
             "type": "publicKey"
           },
           {
-            "name": "isOnchain",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "User",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "ts",
-            "type": "i64"
-          },
-          {
-            "name": "pubkey",
-            "type": "publicKey"
-          },
-          {
-            "name": "nick",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "project",
+            "name": "authority",
             "type": "publicKey"
           }
         ]
       }
     }
-  ]
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    }
+  ],
+  "metadata": {
+    "address": "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD"
+  }
 }

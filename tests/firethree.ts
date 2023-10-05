@@ -1,4 +1,4 @@
-import { PublicKey } from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import { Firethree } from "../target/types/firethree";
 import { encodeName, decodeName } from "../sdk/src/utils/name";
 import * as anchor from "@coral-xyz/anchor";
@@ -6,6 +6,7 @@ import IDL from "../sdk/src/idl/firethree.json";
 import { expect } from "chai";
 
 describe("Firethree", () => {
+  const name = encodeName("Slide v8");
   const provider = anchor.AnchorProvider.local(
     "https://api.devnet.solana.com",
     {
@@ -23,35 +24,33 @@ describe("Firethree", () => {
 
   anchor.setProvider(provider);
 
-  // it("Should able to create a project", async () => {
-  //   const name = encodeName("Slide v5");
+  it("Should able to create a project", async () => {
+    const [ProjectPDA] = PublicKey.findProgramAddressSync(
+      [Buffer.from("project"), Buffer.from(name)],
+      program.programId
+    );
 
-  //   const [ProjectPDA] = PublicKey.findProgramAddressSync(
-  //     [Buffer.from("project"), Buffer.from(name)],
-  //     program.programId
-  //   );
+    const multisigKey = Keypair.generate().publicKey;
 
-  //   await program.methods
-  //     .setupProject({
-  //       name,
-  //       is_onchain: false,
-  //     })
-  //     .accounts({
-  //       user: provider.wallet.publicKey,
-  //       project: ProjectPDA,
-  //     })
-  //     .rpc();
+    await program.methods
+      .setupProject({
+        name,
+        multisigKey,
+      })
+      .accounts({
+        user: provider.wallet.publicKey,
+        project: ProjectPDA,
+      })
+      .rpc();
 
-  //   const firethree = await program.account.project.fetch(ProjectPDA);
+    const firethree = await program.account.project.fetch(ProjectPDA);
 
-  //   console.log("On-chain data is:", firethree);
+    console.log("On-chain data is:", firethree);
 
-  //   expect(decodeName(firethree.name)).equal(decodeName(name));
-  // });
+    expect(decodeName(firethree.name)).equal(decodeName(name));
+  });
 
   it("Should able to get a project", async () => {
-    const name = encodeName("Slide v5");
-
     const [ProjectPDA] = PublicKey.findProgramAddressSync(
       [Buffer.from("project"), Buffer.from(name)],
       program.programId
@@ -62,5 +61,27 @@ describe("Firethree", () => {
     console.log("On-chain data is:", firethree);
 
     expect(decodeName(firethree.name)).equal(decodeName(name));
+  });
+
+  it("Should able to delete a project", async () => {
+    const [ProjectPDA] = PublicKey.findProgramAddressSync(
+      [Buffer.from("project"), Buffer.from(name)],
+      program.programId
+    );
+
+    let firethree;
+    try {
+      await program.methods
+        .deleteProject()
+        .accounts({
+          user: provider.wallet.publicKey,
+          project: ProjectPDA,
+        })
+        .rpc();
+
+      firethree = await program.account.project.fetch(ProjectPDA);
+    } catch {}
+
+    expect(firethree).to.be.undefined;
   });
 });

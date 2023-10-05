@@ -23,12 +23,28 @@ export type Firethree = {
       ]
       args: [
         {
-          name: 'params'
+          name: 'args'
           type: {
             defined: 'Project'
           }
         }
       ]
+    },
+    {
+      name: 'deleteProject'
+      accounts: [
+        {
+          name: 'user'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'project'
+          isMut: true
+          isSigner: false
+        }
+      ]
+      args: []
     }
   ]
   accounts: [
@@ -64,45 +80,22 @@ export type Firethree = {
             type: 'publicKey'
           },
           {
-            name: 'vault'
+            name: 'multisigKey'
             type: 'publicKey'
           },
           {
-            name: 'isOnchain'
-            type: 'bool'
+            name: 'authority'
+            type: 'publicKey'
           }
         ]
       }
-    },
+    }
+  ]
+  errors: [
     {
-      name: 'user'
-      type: {
-        kind: 'struct'
-        fields: [
-          {
-            name: 'ts'
-            type: 'i64'
-          },
-          {
-            name: 'pubkey'
-            type: 'publicKey'
-          },
-          {
-            name: 'nick'
-            type: {
-              array: ['u8', 32]
-            }
-          },
-          {
-            name: 'bump'
-            type: 'u8'
-          },
-          {
-            name: 'project'
-            type: 'publicKey'
-          }
-        ]
-      }
+      code: 6000
+      name: 'Unauthorized'
+      msg: 'Unauthorized'
     }
   ]
 }
@@ -132,12 +125,28 @@ export const IDL: Firethree = {
       ],
       args: [
         {
-          name: 'params',
+          name: 'args',
           type: {
             defined: 'Project'
           }
         }
       ]
+    },
+    {
+      name: 'deleteProject',
+      accounts: [
+        {
+          name: 'user',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'project',
+          isMut: true,
+          isSigner: false
+        }
+      ],
+      args: []
     }
   ],
   accounts: [
@@ -173,45 +182,22 @@ export const IDL: Firethree = {
             type: 'publicKey'
           },
           {
-            name: 'vault',
+            name: 'multisigKey',
             type: 'publicKey'
           },
           {
-            name: 'isOnchain',
-            type: 'bool'
+            name: 'authority',
+            type: 'publicKey'
           }
         ]
       }
-    },
+    }
+  ],
+  errors: [
     {
-      name: 'user',
-      type: {
-        kind: 'struct',
-        fields: [
-          {
-            name: 'ts',
-            type: 'i64'
-          },
-          {
-            name: 'pubkey',
-            type: 'publicKey'
-          },
-          {
-            name: 'nick',
-            type: {
-              array: ['u8', 32]
-            }
-          },
-          {
-            name: 'bump',
-            type: 'u8'
-          },
-          {
-            name: 'project',
-            type: 'publicKey'
-          }
-        ]
-      }
+      code: 6000,
+      name: 'Unauthorized',
+      msg: 'Unauthorized'
     }
   ]
 }

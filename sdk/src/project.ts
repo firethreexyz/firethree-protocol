@@ -106,7 +106,7 @@ export default class Poject {
     const setupProjectIx = await this.program.methods
       .setupProject({
         name,
-        multisig_key: MultisigPda
+        multisigKey: MultisigPda
       })
       .accounts({
         user: this.provider.wallet.publicKey,

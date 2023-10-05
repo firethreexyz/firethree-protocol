@@ -18,6 +18,7 @@ pub mod firethree {
         project.users = 0;
         project.bump = *ctx.bumps.get("project").unwrap();
         project.pubkey = *project.to_account_info().key;
+        project.authority = *ctx.accounts.user.key;
 
         let clock: Clock = Clock::get().unwrap();
         project.ts = clock.unix_timestamp;
@@ -25,15 +26,15 @@ pub mod firethree {
         Ok(())
     }
 
-    // pub fn create_user(ctx: Context<User>, params: Project) -> Result<()> {
-    //     Ok(())
-    // }
+    pub fn delete_project(ctx: Context<DeleteProject>) -> Result<()> {
+        let project: &mut Account<Project> = &mut ctx.accounts.project;
 
-    // pub fn update_user(ctx: ƒContext<User>, params: Project)
+        if project.authority != *ctx.accounts.user.key {
+            return Err(ErrorCode::Unauthorized.into());
+        }
 
-    // pub fn delete_user(ctx: Context<User>, params: Project) -> Result<()> {
-    //     Ok(())
-    // }
+        Ok(())
+    }
 }
 
 #[account]
@@ -45,15 +46,7 @@ pub struct Project {
     pub bump: u8,
     pub shdw: Pubkey,
     pub multisig_key: Pubkey,
-}
-
-#[account]
-pub struct User {
-    pub ts: i64,        // timestamp
-    pub pubkey: Pubkey, // user public keyƒ
-    pub nick: [u8; 32],
-    pub bump: u8,
-    pub project: Pubkey,
+    pub authority: Pubkey,
 }
 
 #[derive(Accounts)]
@@ -65,4 +58,18 @@ pub struct SetupProject<'info> {
     pub project: Account<'info, Project>,
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct DeleteProject<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+    #[account(mut, close = user)]
+    pub project: Account<'info, Project>,
+}
+
+#[error_code]
+pub enum ErrorCode {
+    #[msg("Unauthorized")]
+    Unauthorized,
 }
