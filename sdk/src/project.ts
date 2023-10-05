@@ -105,6 +105,10 @@ export default class Poject {
       MultisigPda
     )
 
+    if (multisigAccount.createKey.toBase58() !== ProjectPDA.toBase58()) {
+      throw new Error('Multisig account not created')
+    }
+
     const setupProjectIx = await this.program.methods
       .projectCreate({
         name,
