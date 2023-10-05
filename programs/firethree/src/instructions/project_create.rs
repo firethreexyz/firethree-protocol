@@ -92,7 +92,7 @@ impl ProjectCreate<'_> {
 
         project.name = args.name;
         project.shdw = args.shdw;
-        project.multisig_key = args.multisig_key;
+        project.multisig_key = *ctx.accounts.multisig.to_account_info().key;
         project.users = 0;
         project.bump = *ctx.bumps.get("project").unwrap();
         project.pubkey = *project.to_account_info().key;

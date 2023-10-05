@@ -1,11 +1,12 @@
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { Firethree, IDL } from "../target/types/firethree";
+import { Firethree } from "../target/types/firethree";
+import IDL from "../target/idl/firethree.json";
 import { encodeName, decodeName } from "../sdk/src/utils/name";
 import * as anchor from "@coral-xyz/anchor";
 import { expect } from "chai";
 
 describe("Firethree", () => {
-  const name = encodeName("Slide v8");
+  const name = encodeName("Slide v9");
   const provider = anchor.AnchorProvider.local(
     "https://api.devnet.solana.com",
     {
@@ -16,7 +17,7 @@ describe("Firethree", () => {
   );
 
   const program = new anchor.Program<Firethree>(
-    IDL,
+    IDL as any,
     "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD",
     provider
   );
@@ -29,16 +30,16 @@ describe("Firethree", () => {
       program.programId
     );
 
-    const multisigKey = Keypair.generate().publicKey;
+    const multisig = Keypair.generate().publicKey;
 
     await program.methods
       .projectCreate({
         name,
-        multisigKey,
       })
       .accounts({
         payer: provider.wallet.publicKey,
         project: ProjectPDA,
+        multisig: multisig,
       })
       .rpc();
 

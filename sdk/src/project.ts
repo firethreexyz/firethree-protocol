@@ -32,13 +32,21 @@ export default class Poject {
     )
   }
 
-  public get(name: string) {
+  /**
+   * Get a project
+   *  @param name Project name
+   */
+  public async get(name: string) {
     const projectName = encodeName(name)
 
     const [ProjectPDA] = PublicKey.findProgramAddressSync(
       [Buffer.from('project'), Buffer.from(projectName)],
       this.program.programId
     )
+
+    const project = await this.program.account.project.fetch(ProjectPDA)
+
+    return project
   }
 
   /**
