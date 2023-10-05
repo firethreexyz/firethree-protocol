@@ -16,7 +16,7 @@ pub struct UserCreate<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    #[account(init, payer = payer, space = 8 + mem::size_of::<User>(), seeds = [b"user", project.multisig_key.as_ref(), user.key().as_ref()], bump)]
+    #[account(init, payer = payer, space = 8 + mem::size_of::<User>(), seeds = [b"user", project.name.as_ref(), user.key().as_ref()], bump)]
     pub user: Account<'info, User>,
 
     #[account(mut)]

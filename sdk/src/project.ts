@@ -61,16 +61,19 @@ export default class Poject {
   }) {
     const projectName = encodeName(name)
 
-    const createKey = Keypair.generate().publicKey
+    const [ProjectPDA] = PublicKey.findProgramAddressSync(
+      [Buffer.from('project'), Buffer.from(projectName)],
+      this.program.programId
+    )
 
     const [MultisigPda] = multisig.getMultisigPda({
-      createKey
+      createKey: ProjectPDA
     })
 
     const { blockhash } = await this.connection.getLatestBlockhash()
 
     const multisigTransaction = multisig.transactions.multisigCreate({
-      createKey,
+      createKey: ProjectPDA,
       creator,
       blockhash,
       multisigPda: MultisigPda,
@@ -97,9 +100,9 @@ export default class Poject {
       this.opts
     )
 
-    const [ProjectPDA] = PublicKey.findProgramAddressSync(
-      [Buffer.from('project'), Buffer.from(projectName)],
-      this.program.programId
+    const multisigAccount = await multisig.accounts.Multisig.fromAccountAddress(
+      this.connection,
+      MultisigPda
     )
 
     const setupProjectIx = await this.program.methods
@@ -109,7 +112,8 @@ export default class Poject {
       })
       .accounts({
         payer: this.provider.wallet.publicKey,
-        project: ProjectPDA
+        project: ProjectPDA,
+        multisig: MultisigPda
       })
       .instruction()
 
