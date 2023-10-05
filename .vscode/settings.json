@@ -1,7 +1,0 @@
-{
- "rust-analyzer.linkedProjects": [
-  "./programs/firethree/Cargo.toml",
-  "./programs/firethree/Cargo.toml"
- ],
- "rust-analyzer.showUnlinkedFileNotification": false
-}
