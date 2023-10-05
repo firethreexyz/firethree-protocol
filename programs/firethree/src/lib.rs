@@ -31,6 +31,7 @@ pub mod firethree {
         let user: &mut Account<User> = &mut ctx.accounts.user;
 
         user.pubkey = *user.to_account_info().key;
+        user.authority = *ctx.accounts.payer.key;
         user.bump = *ctx.bumps.get("user").unwrap();
 
         project.users += 1;
@@ -65,6 +66,7 @@ pub struct Project {
 pub struct User {
     pub ts: i64, // timestamp
     pub pubkey: Pubkey,
+    pub authority: Pubkey,
     pub bump: u8,
 }
 
