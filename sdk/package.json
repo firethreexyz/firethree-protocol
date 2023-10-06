@@ -1,6 +1,6 @@
 {
   "name": "@firethreexyz/firethree-protocol",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "The official firethree. Create your own solona dApp with collection, storage, analytics, hosting with this protocol using shadow drive and multisig!",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
