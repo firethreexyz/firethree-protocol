@@ -13,7 +13,8 @@
     "paths": {
       "*": ["./types/*"]
     },
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"],
   "exclude": ["__tests__", "src/**/*.spec.ts", "src/**/*.js"]
