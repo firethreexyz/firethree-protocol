@@ -62,17 +62,20 @@ export default class Poject {
    *  @param creator Owner of the project
    *  @param members Members of the project
    *  @param threshold Votes for a transaction proposal to be approved (Muiltisig)
+   *  @param shdwSize Amount of storage you are requesting to create. Should be in a string like '1KB', '1MB', '1GB'. Only KB, MB, and GB storage delineations are supported currently.
    */
   public async create({
     name,
     creator,
     members,
-    threshold
+    threshold,
+    shdwSize
   }: {
     name: string
     creator: PublicKey
     members: PublicKey[]
     threshold: number
+    shdwSize: string
   }) {
     const projectName = encodeName(name)
 
@@ -84,10 +87,6 @@ export default class Poject {
     const [MultisigPda] = multisig.getMultisigPda({
       createKey: ProjectPDA
     })
-
-    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
-
-    const { shdw_bucket } = await shdwDrive.createStorageAccount(name, '20MB')
 
     const { blockhash } = await this.connection.getLatestBlockhash()
 
@@ -127,6 +126,10 @@ export default class Poject {
     if (multisigAccount.createKey.toBase58() !== ProjectPDA.toBase58()) {
       throw new Error('Multisig account not created')
     }
+
+    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
+
+    const { shdw_bucket } = await shdwDrive.createStorageAccount(name, shdwSize)
 
     const setupProjectIx = await this.program.methods
       .projectCreate({
