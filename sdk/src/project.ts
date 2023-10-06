@@ -1,7 +1,6 @@
 import {
   ConfirmOptions,
   Connection,
-  Keypair,
   PublicKey,
   TransactionMessage,
   VersionedTransaction

@@ -91,6 +91,16 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.50.0.tgz#9e93b850f0f3fa35f5fa59adfd03adae8488e484"
   integrity sha512-NCC3zz2+nvYd+Ckfh87rA47zfu2QsQpvc6k1yzTk+b9KzRj0wkGa8LSoGOXN6Zv4lRf/EIoZ80biDh9HOI+RNQ==
 
+"@firethreexyz/firethree-protocol@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@firethreexyz/firethree-protocol/-/firethree-protocol-0.0.5.tgz#39357184834a9ce793718f79f5d22a2a42795ed1"
+  integrity sha512-rLaVyp2/UwxTGi4q6EMPGGP8v9sG5RKA90fKjn9QZPxsiJJk7Pb4+Ze7ZlgO2Ld3cjNWuZr5dpJqw2CQenIgXw==
+  dependencies:
+    "@project-serum/anchor" "0.26.0"
+    "@shadow-drive/sdk" "5.0.0"
+    "@sqds/multisig" "^1.10.0"
+    bs58 "5.0.0"
+
 "@hapi/hoek@^9.0.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.3.0.tgz#8368869dcb735be2e7f5cb7647de78e167a251fb"

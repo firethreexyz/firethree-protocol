@@ -1,9 +1,9 @@
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { Firethree } from "../target/types/firethree";
-import IDL from "../target/idl/firethree.json";
 import { encodeName, decodeName } from "../sdk/src/utils/name";
 import * as anchor from "@coral-xyz/anchor";
 import { expect } from "chai";
+import { IDL } from "../sdk/src/types/firethree";
 
 describe("Firethree", () => {
   const name = encodeName("Slide v9");
@@ -17,7 +17,7 @@ describe("Firethree", () => {
   );
 
   const program = new anchor.Program<Firethree>(
-    IDL as any,
+    IDL,
     "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD",
     provider
   );
