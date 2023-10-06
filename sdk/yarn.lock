@@ -112,6 +112,17 @@
     "@sqds/multisig" "^1.10.0"
     bs58 "5.0.0"
 
+"@firethreexyz/firethree-protocol@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@firethreexyz/firethree-protocol/-/firethree-protocol-0.0.7.tgz#05946f4c9ac08e5f658d1c850f42a9c9f659c92f"
+  integrity sha512-XqdtrJBcXZu9k8pbSN6nI6sDCBrup6Op8fH6J5szHsdnJS3uhoAT8a/H0RjHPDGzErpfFBc2EG/qX+yLYp+GKA==
+  dependencies:
+    "@firethreexyz/firethree-protocol" "^0.0.6"
+    "@project-serum/anchor" "0.26.0"
+    "@shadow-drive/sdk" "5.0.0"
+    "@sqds/multisig" "^1.10.0"
+    bs58 "5.0.0"
+
 "@hapi/hoek@^9.0.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.3.0.tgz#8368869dcb735be2e7f5cb7647de78e167a251fb"
