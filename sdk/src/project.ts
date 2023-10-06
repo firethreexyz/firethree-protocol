@@ -12,6 +12,7 @@ import { FIRETHREE_PROGRAM_ID } from './constants/program'
 import { encodeName } from './utils/name'
 import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
+import { ShdwDrive } from '@shadow-drive/sdk'
 
 export default class Poject {
   program: Program<Firethree>
@@ -78,6 +79,10 @@ export default class Poject {
       createKey: ProjectPDA
     })
 
+    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
+
+    const { shdw_bucket } = await shdwDrive.createStorageAccount(name, '20MB')
+
     const { blockhash } = await this.connection.getLatestBlockhash()
 
     const multisigTransaction = multisig.transactions.multisigCreate({
@@ -120,7 +125,8 @@ export default class Poject {
     const setupProjectIx = await this.program.methods
       .projectCreate({
         name,
-        multisigKey: MultisigPda
+        multisigKey: MultisigPda,
+        shdw: new PublicKey(shdw_bucket)
       })
       .accounts({
         payer: this.provider.wallet.publicKey,
