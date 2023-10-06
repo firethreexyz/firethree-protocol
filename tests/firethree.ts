@@ -3,7 +3,7 @@ import { Firethree } from "../target/types/firethree";
 import { encodeName, decodeName } from "../sdk/src/utils/name";
 import * as anchor from "@coral-xyz/anchor";
 import { expect } from "chai";
-import { IDL } from "../sdk/src/types/firethree";
+import IDL from "../sdk/src/idl/firethree.json";
 
 describe("Firethree", () => {
   const name = encodeName("Slide v9");
@@ -17,7 +17,7 @@ describe("Firethree", () => {
   );
 
   const program = new anchor.Program<Firethree>(
-    IDL,
+    IDL as any,
     "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD",
     provider
   );
