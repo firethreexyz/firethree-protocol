@@ -1,6 +1,0 @@
-export { default as Auth } from './auth'
-export { default as Analytics } from './analytics'
-export { default as Collection } from './collection'
-export { default as Hosting } from './hosting'
-export { default as Storage } from './storage'
-export { default as Project } from './project'

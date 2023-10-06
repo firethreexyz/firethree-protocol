@@ -44,7 +44,7 @@
   },
   "homepage": "https://firethree.xyz",
   "dependencies": {
-    "@firethreexyz/firethree-protocol": "^0.0.5",
+    "@firethreexyz/firethree-protocol": "^0.0.6",
     "@project-serum/anchor": "0.26.0",
     "@shadow-drive/sdk": "5.0.0",
     "@sqds/multisig": "^1.10.0",
