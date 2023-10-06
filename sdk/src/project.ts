@@ -5,13 +5,14 @@ import {
   TransactionMessage,
   VersionedTransaction
 } from '@solana/web3.js'
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { Firethree, IDL } from './types/firethree'
 import { FIRETHREE_PROGRAM_ID } from './constants/program'
 import { encodeName } from './utils/name'
 import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive } from '@shadow-drive/sdk'
+import { Wallet } from './types/wallet'
 
 export default class Poject {
   program: Program<Firethree>
@@ -24,7 +25,12 @@ export default class Poject {
     this.connection = connection
     this.wallet = wallet
     this.opts = opts || AnchorProvider.defaultOptions()
-    this.provider = new AnchorProvider(this.connection, this.wallet, this.opts)
+    this.provider = new AnchorProvider(
+      this.connection,
+      // @ts-ignore
+      this.wallet,
+      this.opts
+    )
     this.program = new Program<Firethree>(
       IDL,
       FIRETHREE_PROGRAM_ID,
@@ -105,7 +111,7 @@ export default class Poject {
     })
 
     const multisigTransactionSigned =
-      await this.wallet.signTransaction(multisigTransaction)
+      await this.wallet.signVersionedTransaction(multisigTransaction)
 
     await this.connection.sendRawTransaction(
       multisigTransactionSigned.serialize(),
@@ -140,9 +146,10 @@ export default class Poject {
       instructions: [setupProjectIx]
     }).compileToV0Message()
 
-    const setupProjecTransactionSigned = await this.wallet.signTransaction(
-      new VersionedTransaction(message)
-    )
+    const setupProjecTransactionSigned =
+      await this.wallet.signVersionedTransaction(
+        new VersionedTransaction(message)
+      )
 
     await this.connection.sendRawTransaction(
       setupProjecTransactionSigned.serialize(),

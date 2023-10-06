@@ -1,9 +1,10 @@
 import { ConfirmOptions, Connection } from '@solana/web3.js'
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { Firethree, IDL } from './types/firethree'
 import { FIRETHREE_PROGRAM_ID } from './constants/program'
 import { getProjectPDA } from './utils/helpers'
 import { ShdwDrive } from '@shadow-drive/sdk'
+import { Wallet } from './types/wallet'
 
 export default class Hosting {
   program: Program<Firethree>
@@ -16,7 +17,12 @@ export default class Hosting {
     this.connection = connection
     this.wallet = wallet
     this.opts = opts || AnchorProvider.defaultOptions()
-    this.provider = new AnchorProvider(this.connection, this.wallet, this.opts)
+    this.provider = new AnchorProvider(
+      this.connection,
+      // @ts-ignore
+      this.wallet,
+      this.opts
+    )
     this.program = new Program<Firethree>(
       IDL,
       FIRETHREE_PROGRAM_ID,

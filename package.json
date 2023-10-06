@@ -4,7 +4,7 @@
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
     "update-types": "cp target/types/firethree.ts sdk/src/types/firethree.ts && prettier --write sdk/src/types/firethree.ts",
     "update-idl": "cp target/idl/firethree.json sdk/src/idl/firethree.json",
-    "anchor-tests": "yarn update-types && yarn update-idl && yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+    "anchor-tests": "yarn update-types && yarn update-idl && yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*"
   },
   "license": "ISC",
   "devDependencies": {
@@ -21,6 +21,6 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@sqds/multisig": "^1.10.0"
+    "@sqds/multisig": "1.10.0"
   }
 }
