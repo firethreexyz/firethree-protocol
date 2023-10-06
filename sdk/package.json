@@ -1,14 +1,13 @@
 {
   "name": "@firethreexyz/firethree-protocol",
-  "version": "0.0.1",
-  "description": "The official firethree. Create your own solona on-chain collection, storage, analytics with this protocol.",
+  "version": "0.0.3",
+  "description": "The official firethree. Create your own solona dApp with collection, storage, analytics, hosting with this protocol using shadow drive and multisig!",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
     "clean": "rimraf dist",
-    "prebuild": "yarn clean",
+    "build": "yarn run clean && tsc --declaration",
     "prepublishOnly": "yarn build",
     "docs": "typedoc --excludePrivate --includeVersion --out ./docs src"
   },
@@ -33,7 +32,9 @@
     "web3 collection",
     "web3 storage",
     "web3 analytics",
-    "web3 hosting"
+    "web3 hosting",
+    "multisig squads",
+    "GenesysGO shadow drive"
   ],
   "author": "Firethree",
   "license": "MIT",
