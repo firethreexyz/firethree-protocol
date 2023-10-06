@@ -1,13 +1,13 @@
 {
   "name": "@firethreexyz/firethree-protocol",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "The official firethree. Create your own solona dApp with collection, storage, analytics, hosting with this protocol using shadow drive and multisig!",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn run clean && tsc --declaration",
+    "build": "yarn run clean && tsc",
     "prepublishOnly": "yarn build",
     "docs": "typedoc --excludePrivate --includeVersion --out ./docs src",
     "start": "yarn build && node ./dist/index.js"
@@ -44,7 +44,6 @@
   },
   "homepage": "https://firethree.xyz",
   "dependencies": {
-    "@firethreexyz/firethree-protocol": "^0.0.7",
     "@project-serum/anchor": "0.26.0",
     "@shadow-drive/sdk": "5.0.0",
     "@sqds/multisig": "^1.10.0",

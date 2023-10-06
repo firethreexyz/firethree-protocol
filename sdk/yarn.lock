@@ -123,6 +123,28 @@
     "@sqds/multisig" "^1.10.0"
     bs58 "5.0.0"
 
+"@firethreexyz/firethree-protocol@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@firethreexyz/firethree-protocol/-/firethree-protocol-0.0.8.tgz#f4c01b5c156c6d173b9eb1d0e4644180aea07edc"
+  integrity sha512-wvc60UWRX5MjUbJDTJ34PYLVuAblavTfxYmsLDqqeVHaK3cVQmqXd/puO5b8Ja0LWVccyqeIaXD1M9mWK83n4g==
+  dependencies:
+    "@firethreexyz/firethree-protocol" "^0.0.7"
+    "@project-serum/anchor" "0.26.0"
+    "@shadow-drive/sdk" "5.0.0"
+    "@sqds/multisig" "^1.10.0"
+    bs58 "5.0.0"
+
+"@firethreexyz/firethree-protocol@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@firethreexyz/firethree-protocol/-/firethree-protocol-0.0.9.tgz#0c6040b99807d93e4709d2379f5cf7c202946a77"
+  integrity sha512-0J1LmQHFU2pKJxkglpKjpdaAlflGicME3DtYocBl4XSAxVU0glYpTxkrfZ9f6wEMr+9delK2C+ZSGa2FO5vbDg==
+  dependencies:
+    "@firethreexyz/firethree-protocol" "^0.0.8"
+    "@project-serum/anchor" "0.26.0"
+    "@shadow-drive/sdk" "5.0.0"
+    "@sqds/multisig" "^1.10.0"
+    bs58 "5.0.0"
+
 "@hapi/hoek@^9.0.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.3.0.tgz#8368869dcb735be2e7f5cb7647de78e167a251fb"

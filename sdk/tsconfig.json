@@ -16,9 +16,5 @@
     "esModuleInterop": true
   },
   "include": ["src/**/*"],
-  "exclude": ["__tests__", "src/**/*.spec.ts", "src/**/*.js"],
-  "jsdoc": {
-    "out": "support/jsdoc",
-    "access": "public"
-  }
+  "exclude": ["__tests__", "src/**/*.spec.ts", "src/**/*.js"]
 }
