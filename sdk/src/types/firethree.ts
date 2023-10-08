@@ -90,14 +90,6 @@ export type Firethree = {
             }
           },
           {
-            name: 'pubkey'
-            type: 'publicKey'
-          },
-          {
-            name: 'users'
-            type: 'u32'
-          },
-          {
             name: 'bump'
             type: 'u8'
           },
@@ -272,14 +264,6 @@ export const IDL: Firethree = {
             type: {
               array: ['u8', 32]
             }
-          },
-          {
-            name: 'pubkey',
-            type: 'publicKey'
-          },
-          {
-            name: 'users',
-            type: 'u32'
           },
           {
             name: 'bump',

@@ -93,14 +93,6 @@
             }
           },
           {
-            "name": "pubkey",
-            "type": "publicKey"
-          },
-          {
-            "name": "users",
-            "type": "u32"
-          },
-          {
             "name": "bump",
             "type": "u8"
           },
@@ -185,8 +177,5 @@
       "name": "UnauthorizedToDeleteProject",
       "msg": "Unauthorized to delete the project"
     }
-  ],
-  "metadata": {
-    "address": "Fire3T9ABT33UYoVJZwWUnbPR3rgoVw98y82UgHZ8Bm"
-  }
+  ]
 }

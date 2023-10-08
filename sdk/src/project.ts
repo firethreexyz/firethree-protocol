@@ -75,10 +75,24 @@ export default class Poject {
   }) {
     const projectName = encodeName(name)
 
+    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
+
     const [ProjectPDA] = PublicKey.findProgramAddressSync(
       [Buffer.from('project'), Buffer.from(projectName)],
       this.program.programId
     )
+
+    try {
+      const account = await this.get(name)
+
+      if (account.authority) {
+        throw Error('Project already exists')
+      }
+    } catch (e) {
+      if (e.message === 'Project already exists') {
+        throw e
+      }
+    }
 
     const createKey = new Keypair()
 
@@ -110,14 +124,28 @@ export default class Poject {
       memo: name
     })
 
-    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
+    const storageAcc = await shdwDrive.getStorageAccounts()
+    let shdw = null
 
-    const { shdw_bucket } = await shdwDrive.createStorageAccount(name, shdwSize)
+    const hasStorage = storageAcc.find((acc) => acc.account.identifier === name)
+
+    if (hasStorage) {
+      shdw = new PublicKey(hasStorage.account.storage)
+    }
+
+    if (!hasStorage) {
+      const { shdw_bucket } = await shdwDrive.createStorageAccount(
+        name,
+        shdwSize
+      )
+
+      shdw = new PublicKey(shdw_bucket)
+    }
 
     const setupProjectIx = await this.program.methods
       .projectCreate({
         name: projectName,
-        shdw: new PublicKey(shdw_bucket),
+        shdw,
         multisig: MultisigPda,
         createKey: createKey.publicKey
       })
