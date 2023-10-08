@@ -32,14 +32,11 @@ impl UserCreate<'_> {
 
     #[access_control(ctx.accounts.validate())]
     pub fn user_create(ctx: Context<UserCreate>) -> Result<()> {
-        let project: &mut Account<Project> = &mut ctx.accounts.project;
         let user: &mut Account<User> = &mut ctx.accounts.user;
 
         user.pubkey = *user.to_account_info().key;
         user.authority = *ctx.accounts.payer.key;
         user.bump = *ctx.bumps.get("user").unwrap();
-
-        project.users += 1;
 
         Ok(())
     }

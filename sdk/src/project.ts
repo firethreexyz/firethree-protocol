@@ -75,7 +75,6 @@ export default class Poject {
   }) {
     const projectName = encodeName(name)
 
-    console.log(this.program.programId.toBase58())
     const [ProjectPDA] = PublicKey.findProgramAddressSync(
       [Buffer.from('project'), Buffer.from(projectName)],
       this.program.programId
@@ -84,47 +83,43 @@ export default class Poject {
     const createKey = new Keypair()
 
     const [MultisigPda] = multisig.getMultisigPda({
-      createKey: new PublicKey('CJoF4fmjU2Nz273eeJgVejCKTDSVcPCs166uS6HEViBx')
+      createKey: createKey.publicKey
     })
 
     const { blockhash } = await this.connection.getLatestBlockhash()
 
-    // const membersPermissions = members.map((member) => ({
-    //   key: member,
-    //   permissions: Permissions.fromPermissions([Permission.Vote])
-    // }))
+    const membersPermissions = members.map((member) => ({
+      key: member,
+      permissions: Permissions.fromPermissions([Permission.Vote])
+    }))
 
-    // const multisigIx = multisig.instructions.multisigCreate({
-    //   createKey: createKey.publicKey,
-    //   creator,
-    //   multisigPda: MultisigPda,
-    //   configAuthority: null,
-    //   timeLock: 0,
-    //   members: [
-    //     {
-    //       key: creator,
-    //       permissions: Permissions.all()
-    //     },
-    //     ...membersPermissions
-    //   ],
-    //   threshold,
-    //   memo: name
-    // })
+    const multisigIx = multisig.instructions.multisigCreate({
+      createKey: createKey.publicKey,
+      creator,
+      multisigPda: MultisigPda,
+      configAuthority: null,
+      timeLock: 0,
+      members: [
+        {
+          key: creator,
+          permissions: Permissions.all()
+        },
+        ...membersPermissions
+      ],
+      threshold,
+      memo: name
+    })
 
-    // console.log('HERE', multisigIx)
+    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
 
-    // const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
-
-    // const { shdw_bucket } = await shdwDrive.createStorageAccount(name, shdwSize)
+    const { shdw_bucket } = await shdwDrive.createStorageAccount(name, shdwSize)
 
     const setupProjectIx = await this.program.methods
       .projectCreate({
-        name,
-        shdw: new PublicKey('A8hKHk2tBwTqeBLq81dTeynWHDeBiPZVxVamhXVXVmz4'),
+        name: projectName,
+        shdw: new PublicKey(shdw_bucket),
         multisig: MultisigPda,
-        create_key: new PublicKey(
-          'CJoF4fmjU2Nz273eeJgVejCKTDSVcPCs166uS6HEViBx'
-        )
+        createKey: createKey.publicKey
       })
       .accounts({
         payer: this.provider.wallet.publicKey,
@@ -132,24 +127,22 @@ export default class Poject {
       })
       .instruction()
 
-    console.log('HERE 2', setupProjectIx)
+    const message = new TransactionMessage({
+      payerKey: creator,
+      recentBlockhash: blockhash,
+      instructions: [multisigIx, setupProjectIx]
+    }).compileToV0Message()
 
-    // const message = new TransactionMessage({
-    //   payerKey: creator,
-    //   recentBlockhash: blockhash,
-    //   instructions: [setupProjectIx]
-    // }).compileToV0Message()
+    const setupProjecTransactionSigned = await this.wallet.signTransaction(
+      new VersionedTransaction(message)
+    )
 
-    // const setupProjecTransactionSigned = await this.wallet.signTransaction(
-    //   new VersionedTransaction(message)
-    // )
+    setupProjecTransactionSigned.sign([createKey])
 
-    // setupProjecTransactionSigned.sign([createKey])
-
-    // await this.connection.sendRawTransaction(
-    //   setupProjecTransactionSigned.serialize(),
-    //   this.opts
-    // )
+    await this.connection.sendRawTransaction(
+      setupProjecTransactionSigned.serialize(),
+      this.opts
+    )
   }
 
   public update() {}

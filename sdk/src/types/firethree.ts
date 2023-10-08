@@ -25,7 +25,7 @@ export type Firethree = {
         {
           name: 'args'
           type: {
-            defined: 'Project'
+            defined: 'ProjectArgs'
           }
         }
       ]
@@ -145,6 +145,34 @@ export type Firethree = {
       }
     }
   ]
+  types: [
+    {
+      name: 'ProjectArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'name'
+            type: {
+              array: ['u8', 32]
+            }
+          },
+          {
+            name: 'multisig'
+            type: 'publicKey'
+          },
+          {
+            name: 'createKey'
+            type: 'publicKey'
+          },
+          {
+            name: 'shdw'
+            type: 'publicKey'
+          }
+        ]
+      }
+    }
+  ]
   errors: [
     {
       code: 6000
@@ -181,7 +209,7 @@ export const IDL: Firethree = {
         {
           name: 'args',
           type: {
-            defined: 'Project'
+            defined: 'ProjectArgs'
           }
         }
       ]
@@ -296,6 +324,34 @@ export const IDL: Firethree = {
           {
             name: 'bump',
             type: 'u8'
+          }
+        ]
+      }
+    }
+  ],
+  types: [
+    {
+      name: 'ProjectArgs',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'name',
+            type: {
+              array: ['u8', 32]
+            }
+          },
+          {
+            name: 'multisig',
+            type: 'publicKey'
+          },
+          {
+            name: 'createKey',
+            type: 'publicKey'
+          },
+          {
+            name: 'shdw',
+            type: 'publicKey'
           }
         ]
       }

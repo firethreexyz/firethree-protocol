@@ -25,7 +25,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "Project"
+            "defined": "ProjectArgs"
           }
         }
       ]
@@ -143,6 +143,37 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "ProjectArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "multisig",
+            "type": "publicKey"
+          },
+          {
+            "name": "createKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "shdw",
+            "type": "publicKey"
           }
         ]
       }

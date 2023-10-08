@@ -12,7 +12,7 @@ pub mod firethree {
 
     use super::*;
 
-    pub fn project_create(ctx: Context<ProjectCreate>, args: Project) -> Result<()> {
+    pub fn project_create(ctx: Context<ProjectCreate>, args: ProjectArgs) -> Result<()> {
         ProjectCreate::project_create(ctx, args)
     }
 
