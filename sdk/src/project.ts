@@ -1,6 +1,7 @@
 import {
   ConfirmOptions,
   Connection,
+  Keypair,
   PublicKey,
   TransactionMessage,
   VersionedTransaction
@@ -84,16 +85,22 @@ export default class Poject {
       this.program.programId
     )
 
+    const createKey = new Keypair()
+
     const [MultisigPda] = multisig.getMultisigPda({
-      createKey: ProjectPDA
+      createKey: createKey.publicKey
     })
 
     const { blockhash } = await this.connection.getLatestBlockhash()
 
-    const multisigTransaction = multisig.transactions.multisigCreate({
-      createKey: ProjectPDA,
+    const membersPermissions = members.map((member) => ({
+      key: member,
+      permissions: Permissions.fromPermissions([Permission.Vote])
+    }))
+
+    const multisigIx = multisig.instructions.multisigCreate({
+      createKey: createKey.publicKey,
       creator,
-      blockhash,
       multisigPda: MultisigPda,
       configAuthority: null,
       timeLock: 0,
@@ -102,30 +109,11 @@ export default class Poject {
           key: creator,
           permissions: Permissions.all()
         },
-        ...members.map((member) => ({
-          key: member,
-          permissions: Permissions.fromPermissions([Permission.Vote])
-        }))
+        ...membersPermissions
       ],
-      threshold
+      threshold,
+      memo: name
     })
-
-    const multisigTransactionSigned =
-      await this.wallet.signVersionedTransaction(multisigTransaction)
-
-    await this.connection.sendRawTransaction(
-      multisigTransactionSigned.serialize(),
-      this.opts
-    )
-
-    const multisigAccount = await multisig.accounts.Multisig.fromAccountAddress(
-      this.connection,
-      MultisigPda
-    )
-
-    if (multisigAccount.createKey.toBase58() !== ProjectPDA.toBase58()) {
-      throw new Error('Multisig account not created')
-    }
 
     const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
 
@@ -134,7 +122,6 @@ export default class Poject {
     const setupProjectIx = await this.program.methods
       .projectCreate({
         name,
-        multisigKey: MultisigPda,
         shdw: new PublicKey(shdw_bucket)
       })
       .accounts({
@@ -147,13 +134,14 @@ export default class Poject {
     const message = new TransactionMessage({
       payerKey: creator,
       recentBlockhash: blockhash,
-      instructions: [setupProjectIx]
+      instructions: [multisigIx, setupProjectIx]
     }).compileToV0Message()
 
-    const setupProjecTransactionSigned =
-      await this.wallet.signVersionedTransaction(
-        new VersionedTransaction(message)
-      )
+    const setupProjecTransactionSigned = await this.wallet.signTransaction(
+      new VersionedTransaction(message)
+    )
+
+    setupProjecTransactionSigned.sign([createKey])
 
     await this.connection.sendRawTransaction(
       setupProjecTransactionSigned.serialize(),

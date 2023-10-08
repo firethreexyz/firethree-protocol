@@ -5,7 +5,7 @@ pub use instructions::*;
 pub mod errors;
 pub mod instructions;
 
-declare_id!("CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD");
+declare_id!("Fire3T9ABT33UYoVJZwWUnbPR3rgoVw98y82UgHZ8Bm");
 
 #[program]
 pub mod firethree {
