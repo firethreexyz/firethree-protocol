@@ -27,12 +27,7 @@ export default class Poject {
     this.connection = connection
     this.wallet = wallet
     this.opts = opts || AnchorProvider.defaultOptions()
-    this.provider = new AnchorProvider(
-      this.connection,
-      // @ts-ignore
-      this.wallet,
-      this.opts
-    )
+    this.provider = new AnchorProvider(this.connection, this.wallet, this.opts)
     this.program = new Program<Firethree>(
       IDL as any,
       FIRETHREE_PROGRAM_ID,
@@ -80,6 +75,7 @@ export default class Poject {
   }) {
     const projectName = encodeName(name)
 
+    console.log(this.program.programId.toBase58())
     const [ProjectPDA] = PublicKey.findProgramAddressSync(
       [Buffer.from('project'), Buffer.from(projectName)],
       this.program.programId
@@ -88,65 +84,72 @@ export default class Poject {
     const createKey = new Keypair()
 
     const [MultisigPda] = multisig.getMultisigPda({
-      createKey: createKey.publicKey
+      createKey: new PublicKey('CJoF4fmjU2Nz273eeJgVejCKTDSVcPCs166uS6HEViBx')
     })
 
     const { blockhash } = await this.connection.getLatestBlockhash()
 
-    const membersPermissions = members.map((member) => ({
-      key: member,
-      permissions: Permissions.fromPermissions([Permission.Vote])
-    }))
+    // const membersPermissions = members.map((member) => ({
+    //   key: member,
+    //   permissions: Permissions.fromPermissions([Permission.Vote])
+    // }))
 
-    const multisigIx = multisig.instructions.multisigCreate({
-      createKey: createKey.publicKey,
-      creator,
-      multisigPda: MultisigPda,
-      configAuthority: null,
-      timeLock: 0,
-      members: [
-        {
-          key: creator,
-          permissions: Permissions.all()
-        },
-        ...membersPermissions
-      ],
-      threshold,
-      memo: name
-    })
+    // const multisigIx = multisig.instructions.multisigCreate({
+    //   createKey: createKey.publicKey,
+    //   creator,
+    //   multisigPda: MultisigPda,
+    //   configAuthority: null,
+    //   timeLock: 0,
+    //   members: [
+    //     {
+    //       key: creator,
+    //       permissions: Permissions.all()
+    //     },
+    //     ...membersPermissions
+    //   ],
+    //   threshold,
+    //   memo: name
+    // })
 
-    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
+    // console.log('HERE', multisigIx)
 
-    const { shdw_bucket } = await shdwDrive.createStorageAccount(name, shdwSize)
+    // const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
+
+    // const { shdw_bucket } = await shdwDrive.createStorageAccount(name, shdwSize)
 
     const setupProjectIx = await this.program.methods
       .projectCreate({
         name,
-        shdw: new PublicKey(shdw_bucket)
+        shdw: new PublicKey('A8hKHk2tBwTqeBLq81dTeynWHDeBiPZVxVamhXVXVmz4'),
+        multisig: MultisigPda,
+        create_key: new PublicKey(
+          'CJoF4fmjU2Nz273eeJgVejCKTDSVcPCs166uS6HEViBx'
+        )
       })
       .accounts({
         payer: this.provider.wallet.publicKey,
-        project: ProjectPDA,
-        multisig: MultisigPda
+        project: ProjectPDA
       })
       .instruction()
 
-    const message = new TransactionMessage({
-      payerKey: creator,
-      recentBlockhash: blockhash,
-      instructions: [multisigIx, setupProjectIx]
-    }).compileToV0Message()
+    console.log('HERE 2', setupProjectIx)
 
-    const setupProjecTransactionSigned = await this.wallet.signTransaction(
-      new VersionedTransaction(message)
-    )
+    // const message = new TransactionMessage({
+    //   payerKey: creator,
+    //   recentBlockhash: blockhash,
+    //   instructions: [setupProjectIx]
+    // }).compileToV0Message()
 
-    setupProjecTransactionSigned.sign([createKey])
+    // const setupProjecTransactionSigned = await this.wallet.signTransaction(
+    //   new VersionedTransaction(message)
+    // )
 
-    await this.connection.sendRawTransaction(
-      setupProjecTransactionSigned.serialize(),
-      this.opts
-    )
+    // setupProjecTransactionSigned.sign([createKey])
+
+    // await this.connection.sendRawTransaction(
+    //   setupProjecTransactionSigned.serialize(),
+    //   this.opts
+    // )
   }
 
   public update() {}

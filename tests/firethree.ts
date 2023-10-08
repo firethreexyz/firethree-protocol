@@ -6,7 +6,7 @@ import { expect } from "chai";
 import IDL from "../sdk/src/idl/firethree.json";
 
 describe("Firethree", () => {
-  const name = encodeName("Slide v9");
+  const name = encodeName("Firethree");
   const provider = anchor.AnchorProvider.local(
     "https://api.devnet.solana.com",
     {
@@ -18,7 +18,7 @@ describe("Firethree", () => {
 
   const program = new anchor.Program<Firethree>(
     IDL as any,
-    "CMDqkbpJ6L4US5FXSFB23hwQGtPJAQrKqvBf2kaJN8BD",
+    "Fire3T9ABT33UYoVJZwWUnbPR3rgoVw98y82UgHZ8Bm",
     provider
   );
 
@@ -30,16 +30,16 @@ describe("Firethree", () => {
       program.programId
     );
 
-    const multisig = Keypair.generate().publicKey;
-
     await program.methods
       .projectCreate({
         name,
+        shdw: new Keypair().publicKey,
+        multisig: new Keypair().publicKey,
+        createKey: new Keypair().publicKey,
       })
       .accounts({
         payer: provider.wallet.publicKey,
         project: ProjectPDA,
-        multisig: multisig,
       })
       .rpc();
 
