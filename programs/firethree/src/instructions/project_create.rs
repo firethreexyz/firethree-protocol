@@ -42,11 +42,11 @@ impl ProjectCreate<'_> {
         let project: &mut Account<Project> = &mut ctx.accounts.project;
 
         project.name = args.name;
-        project.shdw = args.shdw;
-        project.multisig = args.multisig;
-        project.create_key = args.create_key;
+        project.shdw = args.shdw.key();
+        project.multisig = args.multisig.key();
+        project.create_key = args.create_key.key();
         project.bump = *ctx.bumps.get("project").unwrap();
-        project.authority = *ctx.accounts.payer.key;
+        project.authority = ctx.accounts.payer.key();
 
         let clock: Clock = Clock::get().unwrap();
         project.ts = clock.unix_timestamp;

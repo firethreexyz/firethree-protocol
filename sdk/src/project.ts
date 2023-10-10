@@ -10,7 +10,7 @@ import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { Firethree } from './types/firethree'
 import IDL from './idl/firethree.json'
 import { FIRETHREE_PROGRAM_ID } from './constants/program'
-import { encodeName } from './utils/name'
+import { encodeName, decodeName } from './utils/name'
 import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive } from '@shadow-drive/sdk'
@@ -18,21 +18,11 @@ import { Wallet } from './types/wallet'
 
 export default class Poject {
   program: Program<Firethree>
-  provider: AnchorProvider
-  connection: Connection
   wallet: Wallet
-  opts: ConfirmOptions
 
-  constructor(connection: Connection, wallet: Wallet, opts?: ConfirmOptions) {
-    this.connection = connection
+  constructor(program: Program<Firethree>, wallet: Wallet) {
+    this.program = program
     this.wallet = wallet
-    this.opts = opts || AnchorProvider.defaultOptions()
-    this.provider = new AnchorProvider(this.connection, this.wallet, this.opts)
-    this.program = new Program<Firethree>(
-      IDL as any,
-      FIRETHREE_PROGRAM_ID,
-      this.provider
-    )
   }
 
   /**
@@ -49,7 +39,11 @@ export default class Poject {
 
     const project = await this.program.account.project.fetch(ProjectPDA)
 
-    return project
+    return {
+      ...project,
+      name: decodeName(project.name),
+      ts: project.ts.toNumber()
+    }
   }
 
   /**
@@ -75,7 +69,15 @@ export default class Poject {
   }) {
     const projectName = encodeName(name)
 
-    const shdwDrive = await new ShdwDrive(this.connection, this.wallet).init()
+    let shdwDrive = await new ShdwDrive(
+      this.program.provider.connection,
+      this.wallet
+    ).init()
+    let storageAcc = []
+
+    try {
+      storageAcc = await shdwDrive?.getStorageAccounts()
+    } catch {}
 
     const [ProjectPDA] = PublicKey.findProgramAddressSync(
       [Buffer.from('project'), Buffer.from(projectName)],
@@ -100,7 +102,8 @@ export default class Poject {
       createKey: createKey.publicKey
     })
 
-    const { blockhash } = await this.connection.getLatestBlockhash()
+    const { blockhash } =
+      await this.program.provider.connection.getLatestBlockhash()
 
     const membersPermissions = members.map((member) => ({
       key: member,
@@ -124,10 +127,11 @@ export default class Poject {
       memo: name
     })
 
-    const storageAcc = await shdwDrive.getStorageAccounts()
     let shdw = null
 
-    const hasStorage = storageAcc.find((acc) => acc.account.identifier === name)
+    const hasStorage = storageAcc?.find(
+      (acc) => acc.account.identifier === name
+    )
 
     if (hasStorage) {
       shdw = new PublicKey(hasStorage.account.storage)
@@ -150,7 +154,7 @@ export default class Poject {
         createKey: createKey.publicKey
       })
       .accounts({
-        payer: this.provider.wallet.publicKey,
+        payer: this.wallet.publicKey,
         project: ProjectPDA
       })
       .instruction()
@@ -167,15 +171,52 @@ export default class Poject {
 
     setupProjecTransactionSigned.sign([createKey])
 
-    await this.connection.sendRawTransaction(
-      setupProjecTransactionSigned.serialize(),
-      this.opts
+    await this.program.provider.connection.sendRawTransaction(
+      setupProjecTransactionSigned.serialize()
     )
   }
 
   public update() {}
 
-  public delete() {}
+  /**
+   * Delete a project
+   *  @param name Project name
+   */
+  public async requestToDelete({
+    name
+  }: {
+    name: string
+    creator: PublicKey
+    members: PublicKey[]
+    threshold: number
+    shdwSize: string
+  }) {
+    const project = await this.get(name)
+    const [MultisigPda] = multisig.getMultisigPda({
+      createKey: project.createKey
+    })
+    const creator = project.authority
+    const connection = this.program.provider.connection
 
-  public createShadowDriveAccount() {}
+    const { blockhash } = await connection.getLatestBlockhash()
+
+    let multisigAccount = await multisig.accounts.Multisig.fromAccountAddress(
+      connection,
+      MultisigPda
+    )
+
+    const tx = multisig.transactions.proposalCreate({
+      blockhash,
+      feePayer: creator,
+      multisigPda: MultisigPda,
+      transactionIndex: BigInt(multisigAccount.transactionIndex.toString()),
+      creator
+    })
+
+    const setupProjecTransactionSigned = await this.wallet.signTransaction(tx)
+
+    await connection.sendRawTransaction(
+      setupProjecTransactionSigned.serialize()
+    )
+  }
 }

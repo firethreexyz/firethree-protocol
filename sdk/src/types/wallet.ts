@@ -27,5 +27,6 @@ export interface Wallet {
   >(
     transactions: T[]
   ): Promise<T[]> | undefined
+  signMessage(message: Uint8Array): Promise<Uint8Array> | undefined
   publicKey: PublicKey
 }
