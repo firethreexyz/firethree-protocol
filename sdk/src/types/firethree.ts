@@ -34,7 +34,7 @@ export type Firethree = {
       name: 'projectDelete'
       accounts: [
         {
-          name: 'payer'
+          name: 'multisig'
           isMut: true
           isSigner: true
         },
@@ -210,7 +210,7 @@ export const IDL: Firethree = {
       name: 'projectDelete',
       accounts: [
         {
-          name: 'payer',
+          name: 'multisig',
           isMut: true,
           isSigner: true
         },

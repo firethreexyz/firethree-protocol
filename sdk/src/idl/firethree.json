@@ -34,7 +34,7 @@
       "name": "projectDelete",
       "accounts": [
         {
-          "name": "payer",
+          "name": "multisig",
           "isMut": true,
           "isSigner": true
         },

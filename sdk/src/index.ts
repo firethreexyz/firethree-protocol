@@ -1,5 +1,5 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
-import { ConfirmOptions, Connection, PublicKey } from '@solana/web3.js'
+import { ConfirmOptions, Connection } from '@solana/web3.js'
 import { Wallet } from './types/wallet'
 import { ProjectConfig } from './types/project'
 import { Firethree as IFirethree } from './types/firethree'
