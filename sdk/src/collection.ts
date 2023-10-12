@@ -7,10 +7,8 @@ import { PublicKey } from '@solana/web3.js'
 import axios, { AxiosResponse } from 'axios'
 import { GENESYSGO_URL } from './constants/storage'
 import shadowVerifyAccount from './utils/shadowVerifyAccount'
-
-const UUID = require('uuid')
-
 import verifyCollection from './utils/verifyCollection'
+const UUID = require('uuid')
 
 export default class Collection {
   program: Program<Firethree>
