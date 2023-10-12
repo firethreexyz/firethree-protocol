@@ -1,4 +1,4 @@
-const verifyCollectionStructure = <T>(structure: T, data: T) => {
+const verifyCollection = <T>(structure: T, data: T) => {
   let isValid = true
 
   Object.keys(structure).forEach((key) => {
@@ -24,4 +24,4 @@ const verifyCollectionStructure = <T>(structure: T, data: T) => {
   return isValid
 }
 
-export default verifyCollectionStructure
+export default verifyCollection

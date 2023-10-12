@@ -7,8 +7,10 @@ import { PublicKey } from '@solana/web3.js'
 import axios, { AxiosResponse } from 'axios'
 import { GENESYSGO_URL } from './constants/storage'
 import shadowVerifyAccount from './utils/shadowVerifyAccount'
-import { v4 as UUID } from 'uuid'
-import verifyCollectionStructure from './utils/verifyCollectionStructure'
+
+const UUID = require('uuid')
+
+import verifyCollection from './utils/verifyCollection'
 
 export default class Collection {
   program: Program<Firethree>
@@ -50,8 +52,8 @@ export default class Collection {
 
   /**
    * Create a new collection
-   * @param name Collection name to set the structure for (e.g. 'posts')
-   * @param structure Structure of the collection - You can update this later if you want!
+   * @param name Collection name (e.g. 'posts')
+   * @param structure Structure of the document - You can update this later if you want!
    *
    * e.g.
    * ```
@@ -73,23 +75,33 @@ export default class Collection {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
     const structureFile = new File(
-      [JSON.stringify(structure)],
-      `structure-${name}.json`,
+      [
+        JSON.stringify({
+          ...structure,
+          id: 'string'
+        })
+      ],
+      `collection-${name}.json`,
       {
         type: 'application/json'
       }
     )
 
-    const emptyFile = new File([JSON.stringify([])], `data-${name}.json`, {
-      type: 'application/json'
-    })
+    let prefixes = name.split('.')
 
     const dataTransfer = new DataTransfer()
 
-    dataTransfer.items.add(structureFile)
-    dataTransfer.items.add(emptyFile)
+    if (prefixes.length === 1) {
+      const emptyFile = new File([JSON.stringify([])], `doc-${name}.json`, {
+        type: 'application/json'
+      })
 
-    this.shdwDrive.uploadMultipleFiles(
+      dataTransfer.items.add(emptyFile)
+    }
+
+    dataTransfer.items.add(structureFile)
+
+    await this.shdwDrive.uploadMultipleFiles(
       new PublicKey(this.project.shdw),
       dataTransfer.files
     )
@@ -97,15 +109,18 @@ export default class Collection {
     return {
       message: 'Collection created successfully',
       fileUrl: {
-        structure: `${GENESYSGO_URL}/${this.project.shdw}/structure-${name}.json`,
-        data: `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.json`
+        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${name}.json`,
+        doc:
+          prefixes.length === 1
+            ? `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
+            : undefined
       }
     }
   }
 
   /**
-   * Update the structure of a collection and add missing keys to existing documents
-   * @param name Collection name to set the structure for (e.g. 'posts')
+   * Update the structure of a collection and migrate all data to the new structure
+   * @param name Collection name (e.g. 'posts')
    * @param structure New structure of the collection - `WARNING: This will overwrite the old structure!`
    * e.g.
    * ```
@@ -125,8 +140,13 @@ export default class Collection {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
     const structureFile = new File(
-      [JSON.stringify(structure)],
-      `structure-${name}.json`,
+      [
+        JSON.stringify({
+          ...structure,
+          id: 'string'
+        })
+      ],
+      `collection-${name}.json`,
       {
         type: 'application/json'
       }
@@ -134,84 +154,130 @@ export default class Collection {
 
     await this.shdwDrive.editFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/structure-${name}.json`,
+      `${GENESYSGO_URL}/${this.project.shdw}/collection-${name}.json`,
       structureFile
     )
 
     return {
       message: 'Collection updated successfully',
       fileUrl: {
-        structure: `${GENESYSGO_URL}/${this.project.shdw}/structure-${name}.json`,
-        data: `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.json`
+        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${name}.json`,
+        doc: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
       }
     }
   }
 
   /**
    * Add a new document to a collection
-   * @param name Collection name to set the structure for (e.g. 'posts')
+   * @param name Collection name (e.g. 'posts')
    * @param data Data to add to the collection
    *
    */
   public async addDoc<T>({ name, data }: { name: string; data: T }) {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
-    const structureResponse: AxiosResponse<T> = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/structure-${name}.json`
+    let prefixes = name.split('.')
+    let newPrefixes = []
+
+    prefixes.forEach((prefix) => {
+      if (UUID.validate(prefix)) {
+        newPrefixes.push('id')
+
+        return
+      }
+
+      newPrefixes.push(prefix)
+    })
+
+    const collectionPrefix = newPrefixes.join('.')
+    const collectionResponse: AxiosResponse<T> = await axios.get(
+      `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`
     )
 
-    const isValidStructure = verifyCollectionStructure(
-      structureResponse.data,
-      data
-    )
+    if (!collectionResponse.data) {
+      throw new Error(
+        'Collection does not exist, first create the collection trigger the createNewCollection()'
+      )
+    }
 
-    if (!isValidStructure) return
+    const doc = {
+      ...data,
+      id: UUID.v4()
+    }
 
-    const dataReponse = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.json`
-    )
+    const isValidCollection = verifyCollection(collectionResponse.data, doc)
 
-    const uuid = UUID()
+    if (!isValidCollection) return
+
+    let docReponse
+
+    try {
+      docReponse = await axios.get(
+        `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
+      )
+    } catch (error) {}
 
     const uploadFileResponse = await this.shdwDrive.uploadFile(
       new PublicKey(this.project.shdw),
-      new File(
-        [
-          JSON.stringify({
-            ...data,
-            uuid
-          })
-        ],
-        `data-${name}.${uuid}.json`,
-        {
-          type: 'application/json'
-        }
-      )
+      new File([JSON.stringify(doc)], `doc-${name}.${doc.id}.json`, {
+        type: 'application/json'
+      })
     )
 
     if (uploadFileResponse.upload_errors.length > 0) {
       throw new Error('Error to create new document')
     }
 
-    await this.shdwDrive.editFile(
-      new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.json`,
-      new File(
-        [JSON.stringify([...dataReponse.data, uuid])],
-        `data-${name}.json`,
-        {
-          type: 'application/json'
-        }
+    if (docReponse) {
+      await this.shdwDrive.editFile(
+        new PublicKey(this.project.shdw),
+        `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
+        new File(
+          [JSON.stringify([...docReponse.data, doc.id])],
+          `doc-${name}.json`,
+          {
+            type: 'application/json'
+          }
+        )
       )
-    )
+    }
+
+    if (!docReponse) {
+      await this.shdwDrive.uploadFile(
+        new PublicKey(this.project.shdw),
+        new File([JSON.stringify([doc.id])], `doc-${name}.json`, {
+          type: 'application/json'
+        })
+      )
+    }
 
     return {
       message: 'Document created successfully',
-      data: {
-        ...data,
-        uuid
-      },
-      fileUrl: `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.${uuid}.json`
+      doc,
+      fileUrl: {
+        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`,
+        doc: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
+        docId: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${doc.id}.json`
+      }
+    }
+  }
+
+  /**
+   * Get a document from a collection
+   * @param name Collection name (e.g. 'posts')
+   * @param id ID of the document to get if you want to get from a subcollection use (e.g. '1234.likes') or just (e.g. '1234') to get from the main collection
+   *
+   */
+  public async getDoc({ name, id }: { name: string; id: string }) {
+    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
+
+    const response = await axios.get(
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`
+    )
+
+    return {
+      message: 'Document fetched successfully',
+      doc: response.data
     }
   }
 
@@ -236,45 +302,65 @@ export default class Collection {
     }
 
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
+    let prefixes = name.split('.')
+    let newPrefixes = []
 
-    const structureResponse: AxiosResponse<T> = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/structure-${name}.json`
+    prefixes.forEach((prefix) => {
+      if (UUID.validate(prefix)) {
+        newPrefixes.push('id')
+
+        return
+      }
+
+      newPrefixes.push(prefix)
+    })
+
+    const collectionPrefix = newPrefixes.join('.')
+    const collectionResponse: AxiosResponse<T> = await axios.get(
+      `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`
     )
 
-    const isValidStructure = verifyCollectionStructure(
-      structureResponse.data,
-      data
-    )
+    if (!collectionResponse.data) {
+      throw new Error(
+        'Collection does not exist, first create the collection trigger the createNewCollection()'
+      )
+    }
 
-    if (!isValidStructure) return
+    const isValidCollection = verifyCollection(collectionResponse.data, data)
+
+    if (!isValidCollection) return
 
     const dataReponse = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.${id}.json`
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`
     )
 
-    let newData: T = {
+    let doc = {
       ...dataReponse.data,
       ...data
     }
 
     await this.shdwDrive.editFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.${id}.json`,
-      new File([JSON.stringify(newData)], `data-${name}.${id}.json`, {
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`,
+      new File([JSON.stringify(doc)], `doc-${name}.${id}.json`, {
         type: 'application/json'
       })
     )
 
     return {
       message: 'Document updated successfully',
-      data: newData,
-      fileUrl: `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.${id}.json`
+      doc,
+      fileUrl: {
+        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`,
+        doc: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
+        docId: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${doc.id}.json`
+      }
     }
   }
 
   /**
    * Delete a document in a collection
-   * @param name Collection name to set the structure for (e.g. 'posts')
+   * @param name Collection name (e.g. 'posts')
    * @param id ID of the document to delete
    *
    */
@@ -284,22 +370,20 @@ export default class Collection {
     }
 
     const dataReponse = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.json`
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
     )
 
     await this.shdwDrive.deleteFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.${id}.json`
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`
     )
 
     await this.shdwDrive.editFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/data-${name}.json`,
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
       new File(
-        [
-          JSON.stringify(dataReponse.data.filter((uuid: string) => uuid !== id))
-        ],
-        `data-${name}.json`,
+        [JSON.stringify(dataReponse.data.filter((id: string) => id !== id))],
+        `doc-${name}.json`,
         {
           type: 'application/json'
         }
