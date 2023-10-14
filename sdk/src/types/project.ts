@@ -1,4 +1,4 @@
-export type ProjectConfig = {
+export type Project = {
   name: string
   shdw: string
   multisig: string

@@ -2,7 +2,7 @@ import { Program } from '@coral-xyz/anchor'
 import { Firethree } from './types/firethree'
 import { Wallet } from './types/wallet'
 import { ShdwDrive } from '@shadow-drive/sdk'
-import { ProjectConfig } from './types/project'
+import { Project } from './types/project'
 import { PublicKey } from '@solana/web3.js'
 import axios, { AxiosResponse } from 'axios'
 import { GENESYSGO_URL } from './constants/storage'
@@ -13,14 +13,10 @@ const UUID = require('uuid')
 export default class Collection {
   program: Program<Firethree>
   wallet: Wallet
-  project: ProjectConfig
+  project: Project
   shdwDrive: ShdwDrive
 
-  constructor(
-    program: Program<Firethree>,
-    wallet: Wallet,
-    project: ProjectConfig
-  ) {
+  constructor(program: Program<Firethree>, wallet: Wallet, project: Project) {
     this.program = program
     this.wallet = wallet
     this.project = project
@@ -364,17 +360,21 @@ export default class Collection {
    */
   public async deleteDoc({ name, id }: { name: string; id: string }) {
     if (!id) {
-      throw new Error('You must provide an ID to edit a document')
+      throw new Error('You must provide an ID to delete a document')
     }
 
     const dataReponse = await axios.get(
       `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
     )
 
-    await this.shdwDrive.deleteFile(
+    const response = await this.shdwDrive.deleteFile(
       new PublicKey(this.project.shdw),
       `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`
     )
+
+    if (!response?.transaction_signature) {
+      throw new Error('Error to delete document')
+    }
 
     await this.shdwDrive.editFile(
       new PublicKey(this.project.shdw),
@@ -389,7 +389,7 @@ export default class Collection {
     )
 
     return {
-      message: 'Document deleted successfully'
+      message: response.message || 'Document deleted successfully'
     }
   }
 }
