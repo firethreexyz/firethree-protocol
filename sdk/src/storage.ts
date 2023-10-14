@@ -25,13 +25,17 @@ export default class Storage {
     this.init()
   }
 
-  async init() {
+  private async init() {
     this.shdwDrive = await new ShdwDrive(
       this.program.provider.connection,
       this.wallet
     ).init()
   }
 
+  /**
+   * Add Multiple Files
+   * @param files List of files to be uploaded
+   */
   public async addMultipleFiles(files: FileList) {
     shadowVerifyAccount(this.shdwDrive, this.shdwKey)
 
@@ -48,6 +52,10 @@ export default class Storage {
     return this.shdwDrive.uploadMultipleFiles(this.shdwKey, dataTransfer.files)
   }
 
+  /**
+   * Add File
+   * @param files File to be uploaded
+   */
   public async addFile(file: File) {
     shadowVerifyAccount(this.shdwDrive, this.shdwKey)
 
@@ -58,6 +66,10 @@ export default class Storage {
     return this.shdwDrive.uploadFile(this.shdwKey, newFile)
   }
 
+  /**
+   * Get File
+   * @param id File ID
+   */
   async getFile(id: string) {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
@@ -73,6 +85,10 @@ export default class Storage {
     }
   }
 
+  /**
+   * Delete File
+   * @param id File ID
+   */
   async deleteFile(id: File) {
     if (!id) {
       throw new Error('You must provide an ID to delete a document')
@@ -92,6 +108,11 @@ export default class Storage {
     }
   }
 
+  /**
+   * Update File
+   * @param id File ID
+   * @param newFile New File
+   */
   async updateFile(id: string, newFile: File) {
     if (!id) {
       throw new Error('You must provide an ID to edit a document')
