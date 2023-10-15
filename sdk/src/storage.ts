@@ -7,7 +7,7 @@ import { Project } from './types/project'
 import shadowVerifyAccount from './utils/shadowVerifyAccount'
 import axios from 'axios'
 import { GENESYSGO_URL } from './constants/storage'
-const UUID = require('uuid')
+import { v4 as uuidv4 } from 'uuid'
 
 export default class Storage {
   program: Program<Firethree>
@@ -34,17 +34,24 @@ export default class Storage {
 
   /**
    * Add Multiple Files
+   * @param folder Folder to upload files (e.g. 'images/users/user1')
    * @param files List of files to be uploaded
    */
-  public async addMultipleFiles(files: FileList) {
+  public async addMultipleFiles(folder: string, files: FileList) {
     shadowVerifyAccount(this.shdwDrive, this.shdwKey)
 
     const dataTransfer = new DataTransfer()
 
+    const replaceFolder = folder.replace('/', '-')
+
     Array.from(files).map((file) => {
-      const newFile = new File([file], `${UUID.v4()}-${file.name}`, {
-        type: file.type
-      })
+      const newFile = new File(
+        [file],
+        `${replaceFolder}-${uuidv4()}.${file.name}`,
+        {
+          type: file.type
+        }
+      )
 
       dataTransfer.items.add(newFile)
     })
@@ -54,27 +61,34 @@ export default class Storage {
 
   /**
    * Add File
+   * @param folder Folder to upload file (e.g. 'images/users/user1')
    * @param files File to be uploaded
    */
-  public async addFile(file: File) {
+  public async addFile(folder: string, file: File) {
     shadowVerifyAccount(this.shdwDrive, this.shdwKey)
 
-    const newFile = new File([file], `${UUID.v4()}-${file.name}`, {
-      type: file.type
-    })
+    const replaceFolder = folder.replace('/', '-')
+
+    const newFile = new File(
+      [file],
+      `${replaceFolder}-${uuidv4()}.${file.name}`,
+      {
+        type: file.type
+      }
+    )
 
     return this.shdwDrive.uploadFile(this.shdwKey, newFile)
   }
 
   /**
    * Get File
-   * @param id File ID
+   * @param filePath File Path
    */
-  async getFile(id: string) {
+  async getFile(filePath: string) {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
     const response = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/${id}.json`
+      `${GENESYSGO_URL}/${this.project.shdw}/${filePath}`
     )
 
     if (!response.data) throw new Error('File not found')
@@ -87,16 +101,16 @@ export default class Storage {
 
   /**
    * Delete File
-   * @param id File ID
+   * @param filePath File Path
    */
-  async deleteFile(id: File) {
-    if (!id) {
-      throw new Error('You must provide an ID to delete a document')
+  async deleteFile(filePath: string) {
+    if (!filePath) {
+      throw new Error('You must provide an filePath to delete a document')
     }
 
     const response = await this.shdwDrive.deleteFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/${id}.json`
+      `${GENESYSGO_URL}/${this.project.shdw}/${filePath}`
     )
 
     if (!response?.transaction_signature) {
@@ -110,23 +124,23 @@ export default class Storage {
 
   /**
    * Update File
-   * @param id File ID
+   * @param filePath File Path
    * @param newFile New File
    */
-  async updateFile(id: string, newFile: File) {
-    if (!id) {
-      throw new Error('You must provide an ID to edit a document')
+  async updateFile(filePath: string, newFile: File) {
+    if (!filePath) {
+      throw new Error('You must provide an filePath to edit a document')
     }
 
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
-    const file = new File([newFile], `${UUID.v4()}-${newFile.name}`, {
+    const file = new File([newFile], `${filePath}`, {
       type: newFile.type
     })
 
     await this.shdwDrive.editFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/${id}.json`,
+      `${GENESYSGO_URL}/${this.project.shdw}/${filePath}`,
       file
     )
   }

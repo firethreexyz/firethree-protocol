@@ -48,6 +48,7 @@
     "@shadow-drive/sdk": "5.0.0",
     "@sqds/multisig": "^1.10.0",
     "axios": "^1.5.1",
+    "browser-cookies": "^1.2.0",
     "bs58": "5.0.0",
     "uuid": "^9.0.1"
   },

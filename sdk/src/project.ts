@@ -15,6 +15,7 @@ import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive } from '@shadow-drive/sdk'
 import { Wallet } from './types/wallet'
+import { GENESYSGO_URL } from './constants/storage'
 
 export default class Poject {
   program: Program<Firethree>
@@ -59,13 +60,15 @@ export default class Poject {
     creator,
     members,
     threshold,
-    shdwSize
+    shdwSize,
+    image
   }: {
     name: string
     creator: PublicKey
     members: PublicKey[]
     threshold: number
     shdwSize: string
+    image: File
   }) {
     const projectName = encodeName(name)
 
@@ -127,7 +130,7 @@ export default class Poject {
       memo: name
     })
 
-    let shdw = null
+    let shdw: PublicKey = null
 
     const hasStorage = storageAcc?.find(
       (acc) => acc.account.identifier === name
@@ -174,6 +177,10 @@ export default class Poject {
     await this.program.provider.connection.sendRawTransaction(
       setupProjecTransactionSigned.serialize()
     )
+
+    const newFile = new File([image], `project-${name}`)
+
+    await shdwDrive.uploadFile(shdw, newFile)
   }
 
   public update() {}

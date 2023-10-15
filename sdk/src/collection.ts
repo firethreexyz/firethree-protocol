@@ -24,7 +24,7 @@ export default class Collection {
     this.init()
   }
 
-  async init() {
+  private async init() {
     this.shdwDrive = await new ShdwDrive(
       this.program.provider.connection,
       this.wallet
