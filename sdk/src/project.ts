@@ -198,11 +198,9 @@ export default class Poject {
       }
     })
 
-    const setupProjecTransactionSigned = await this.wallet.signTransaction(tx)
+    const txSigned = await this.wallet.signTransaction(tx)
 
-    await connection.sendRawTransaction(
-      setupProjecTransactionSigned.serialize()
-    )
+    await connection.sendRawTransaction(txSigned.serialize())
   }
 
   /**
