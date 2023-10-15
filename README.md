@@ -2,4 +2,5 @@
   <h1>Firethree</h1>
 </div>
 
-The official firethree. Create your own solona on-chain firestore, storage, analytics with this protocol.
+Create your own Solana dApp with collection, storage, analytics with this protocol. storage with @GenesysGo and multisig by @SquadsProtocol!
+ 
