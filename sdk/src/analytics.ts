@@ -38,8 +38,6 @@ export default class Analytics {
       return
     }
 
-    const coord = response.data.loc.split(',')
-
     return {
       lat: response.data.lat as number,
       lng: response.data.lon as number,
