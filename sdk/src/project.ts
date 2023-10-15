@@ -12,6 +12,7 @@ import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
 import { Wallet } from './types/wallet'
 import { Project as IProject } from './types/project'
+import { getProjectPDA } from './utils/helpers'
 
 export default class Poject {
   program: Program<Firethree>
@@ -182,7 +183,13 @@ export default class Poject {
     await shdwDrive.uploadFile(shdw, newFile)
   }
 
-  public async addMember(project: IProject, member: PublicKey) {
+  /**
+   * Add new Member
+   *  @param name Project name
+   */
+  public async addMember(name: string, member: PublicKey) {
+    const project = await this.get(name)
+
     const connection = this.program.provider.connection
     const { blockhash } = await connection.getLatestBlockhash()
 
@@ -217,31 +224,70 @@ export default class Poject {
     shdwSize: string
   }) {
     const project = await this.get(name)
+
+    const ProjectPDA = getProjectPDA(name, this.program.programId)
+
     const [MultisigPda] = multisig.getMultisigPda({
       createKey: project.createKey
     })
-    const creator = project.authority
-    const connection = this.program.provider.connection
+    const [VaultPda] = multisig.getVaultPda({
+      multisigPda: MultisigPda,
+      index: 0
+    })
 
+    const ix = await this.program.methods
+      .projectDelete()
+      .accounts({
+        project: ProjectPDA,
+        authority: this.wallet.publicKey
+      })
+      .instruction()
+
+    const connection = this.program.provider.connection
     const { blockhash } = await connection.getLatestBlockhash()
 
-    let multisigAccount = await multisig.accounts.Multisig.fromAccountAddress(
+    const txMessage = new TransactionMessage({
+      payerKey: this.wallet.publicKey,
+      recentBlockhash: blockhash,
+      instructions: [ix]
+    })
+
+    const multisigAccount = await multisig.accounts.Multisig.fromAccountAddress(
       connection,
       MultisigPda
     )
 
-    const tx = multisig.transactions.proposalCreate({
-      blockhash,
-      feePayer: creator,
+    const lastTransactionIndex = multisig.utils.toBigInt(
+      multisigAccount.transactionIndex
+    )
+
+    const txIndex = BigInt(Number(lastTransactionIndex.toString()) + 1)
+    const vaultIx = multisig.instructions.vaultTransactionCreate({
       multisigPda: MultisigPda,
-      transactionIndex: BigInt(multisigAccount.transactionIndex.toString()),
-      creator
+      transactionIndex: txIndex,
+      creator: this.wallet.publicKey,
+      vaultIndex: 0,
+      ephemeralSigners: 0,
+      transactionMessage: txMessage,
+      memo: 'Resquest and delete project'
     })
 
-    const setupProjecTransactionSigned = await this.wallet.signTransaction(tx)
+    const proposalIx = multisig.instructions.proposalCreate({
+      multisigPda: MultisigPda,
+      transactionIndex: txIndex,
+      creator: this.wallet.publicKey
+    })
 
-    await connection.sendRawTransaction(
-      setupProjecTransactionSigned.serialize()
+    const message = new TransactionMessage({
+      payerKey: this.wallet.publicKey,
+      recentBlockhash: blockhash,
+      instructions: [vaultIx, proposalIx]
+    }).compileToV0Message()
+
+    const txSigned = await this.wallet.signTransaction(
+      new VersionedTransaction(message)
     )
+
+    await connection.sendRawTransaction(txSigned.serialize())
   }
 }

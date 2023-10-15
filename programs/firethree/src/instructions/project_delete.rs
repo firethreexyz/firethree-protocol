@@ -5,9 +5,9 @@ use anchor_lang::prelude::*;
 #[derive(Accounts)]
 pub struct ProjectDelete<'info> {
     #[account(mut)]
-    pub multisig: Signer<'info>,
+    pub authority: Signer<'info>,
 
-    #[account(mut, close = multisig)]
+    #[account(mut, close = authority)]
     pub project: Account<'info, Project>,
 }
 
@@ -20,7 +20,7 @@ impl ProjectDelete<'_> {
     pub fn project_delete(ctx: Context<ProjectDelete>) -> Result<()> {
         let project: &mut Account<Project> = &mut ctx.accounts.project;
 
-        if project.authority != *ctx.accounts.multisig.key {
+        if project.authority != *ctx.accounts.authority.key {
             return Err(FirethreeError::UnauthorizedToDeleteProject.into());
         }
 

@@ -34,7 +34,7 @@ export type Firethree = {
       name: 'projectDelete'
       accounts: [
         {
-          name: 'multisig'
+          name: 'authority'
           isMut: true
           isSigner: true
         },
@@ -116,24 +116,7 @@ export type Firethree = {
       name: 'user'
       type: {
         kind: 'struct'
-        fields: [
-          {
-            name: 'ts'
-            type: 'i64'
-          },
-          {
-            name: 'pubkey'
-            type: 'publicKey'
-          },
-          {
-            name: 'authority'
-            type: 'publicKey'
-          },
-          {
-            name: 'bump'
-            type: 'u8'
-          }
-        ]
+        fields: []
       }
     }
   ]
@@ -210,7 +193,7 @@ export const IDL: Firethree = {
       name: 'projectDelete',
       accounts: [
         {
-          name: 'multisig',
+          name: 'authority',
           isMut: true,
           isSigner: true
         },
@@ -292,24 +275,7 @@ export const IDL: Firethree = {
       name: 'user',
       type: {
         kind: 'struct',
-        fields: [
-          {
-            name: 'ts',
-            type: 'i64'
-          },
-          {
-            name: 'pubkey',
-            type: 'publicKey'
-          },
-          {
-            name: 'authority',
-            type: 'publicKey'
-          },
-          {
-            name: 'bump',
-            type: 'u8'
-          }
-        ]
+        fields: []
       }
     }
   ],
