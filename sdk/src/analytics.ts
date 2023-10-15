@@ -93,7 +93,7 @@ export default class Analytics {
       `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-user_view.json`
     )
 
-    if (!response.data) {
+    if (response.status === 404) {
       return {
         daily: 0,
         weekly: 0,
@@ -179,7 +179,7 @@ export default class Analytics {
       `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-${name}.json`
     )
 
-    if (!response.data) {
+    if (response.status === 404) {
       const eventListFile = new File(
         [JSON.stringify([])],
         `analytics.list-${name}.json`,
