@@ -11,6 +11,7 @@ import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
 import { Wallet } from './types/wallet'
+import { Project as IProject } from './types/project'
 
 export default class Poject {
   program: Program<Firethree>
@@ -181,13 +182,34 @@ export default class Poject {
     await shdwDrive.uploadFile(shdw, newFile)
   }
 
-  public update() {}
+  public async addMember(project: IProject, member: PublicKey) {
+    const connection = this.program.provider.connection
+    const { blockhash } = await connection.getLatestBlockhash()
+
+    const tx = multisig.transactions.multisigAddMember({
+      blockhash,
+      feePayer: this.wallet.publicKey,
+      multisigPda: new PublicKey(project.multisig),
+      configAuthority: this.wallet.publicKey,
+      rentPayer: this.wallet.publicKey,
+      newMember: {
+        key: member,
+        permissions: Permissions.all()
+      }
+    })
+
+    const setupProjecTransactionSigned = await this.wallet.signTransaction(tx)
+
+    await connection.sendRawTransaction(
+      setupProjecTransactionSigned.serialize()
+    )
+  }
 
   /**
    * Delete a project
    *  @param name Project name
    */
-  public async requestToDelete({
+  public async deleteProject({
     name
   }: {
     name: string

@@ -73,7 +73,7 @@ export default class Analytics {
     ) {
       this.trackEvent('user_view', {})
 
-      this.trackEvent('location', { ...userDataByIp })
+      this.trackEvent('user_location', { ...userDataByIp })
       localStorage.setItem('locationTracked', Date.now().toString())
     }
 
@@ -87,7 +87,7 @@ export default class Analytics {
         id
       })
 
-      this.trackEvent('location', { ...userDataByIp })
+      this.trackEvent('user_location', { ...userDataByIp })
       localStorage.setItem('locationTracked', Date.now().toString())
     }
   }
@@ -229,8 +229,9 @@ export default class Analytics {
     }
 
     const id = uuidv4()
+    const ts = Date.now()
     const eventFile = new File(
-      [JSON.stringify({ ...params, id })],
+      [JSON.stringify({ ...params, id, ts: params.ts || ts })],
       `analytics.list-${name}.${id}.json`,
       {
         type: 'application/json'
@@ -240,7 +241,7 @@ export default class Analytics {
     await this.shdwDrive.uploadFile(new PublicKey(this.project.shdw), eventFile)
 
     const newEventListFile = new File(
-      [JSON.stringify([...listData, { id, ts: params.ts || Date.now() }])],
+      [JSON.stringify([...listData, { id, ts: params.ts || ts }])],
       `analytics.list-${name}.json`,
       {
         type: 'application/json'
