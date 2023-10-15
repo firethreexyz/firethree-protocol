@@ -63,30 +63,32 @@ export default class Analytics {
 
     const userDataByIp = await this.getUserDataByIp()
 
-    const locationTracked = localStorage.get('locationTracked')
+    const localStorage = window.localStorage
+    const locationTracked = localStorage.getItem('locationTracked')
 
     if (
-      localStorage.get('userId') &&
+      localStorage.getItem('userId') &&
       locationTracked &&
       Number(locationTracked) < Date.now() - 1 * 60 * 60 * 1000
     ) {
       this.trackEvent('user_view', {})
 
       this.trackEvent('location', { ...userDataByIp })
-      localStorage.set('locationTracked', Date.now())
+      localStorage.setItem('locationTracked', Date.now().toString())
     }
 
-    if (!localStorage.get('userId')) {
+    if (!localStorage.getItem('userId')) {
       const id = uuidv4()
 
-      localStorage.set('userId', id)
+      localStorage.setItem('userId', id)
+      this.trackEvent('user_view', {})
       this.trackEvent('first_view', {
         ts: Date.now(),
         id
       })
 
-      localStorage.set('locationTracked', true)
-      localStorage.set('locationTracked', Date.now())
+      this.trackEvent('location', { ...userDataByIp })
+      localStorage.setItem('locationTracked', Date.now().toString())
     }
   }
 
@@ -148,9 +150,9 @@ export default class Analytics {
   }
 
   /**
-   * Get Events
+   * Get Main Events List (e.g. page_view, user_view)
    */
-  public async getAllEvents() {
+  public async getMainEventsList() {
     const listObjects = await this.shdwDrive.listObjects(
       new PublicKey(this.project.shdw)
     )
@@ -161,15 +163,36 @@ export default class Analytics {
 
     const response = await Promise.all(
       events.map(async (event) => {
+        const eventSplit = event.split('.')
+
+        if (eventSplit.length > 3) {
+          return null
+        }
+
         const eventResponse = await axios.get(
           `${GENESYSGO_URL}/${this.project.shdw}/${event}`
         )
 
-        return eventResponse.data
+        return {
+          name: eventSplit[1].split('-')[1],
+          data: eventResponse.data
+        }
       })
     )
 
-    return response
+    return response.filter((item) => item !== null)
+  }
+
+  /**
+   * Get Events by Name
+   * @param name Name of the event
+   */
+  public async getEventsByName(name: string) {
+    const response = await axios.get(
+      `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-${name}.json`
+    )
+
+    return response.data
   }
 
   /**
@@ -180,25 +203,34 @@ export default class Analytics {
   public async trackEvent(name: string, params: { [key: string]: any }) {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
-    const response = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-${name}.json`
-    )
+    let listData: { ts: number; id: string }[] = []
 
-    if (response.status === 404) {
-      const eventListFile = new File(
-        [JSON.stringify([])],
-        `analytics.list-${name}.json`,
-        {
-          type: 'application/json'
-        }
+    try {
+      const response = await axios.get(
+        `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-${name}.json`
       )
 
-      this.shdwDrive.uploadFile(new PublicKey(this.project.shdw), eventListFile)
+      listData = response.data
+    } catch (error) {
+      if (error.response.status === 404) {
+        const eventListFile = new File(
+          [JSON.stringify([])],
+          `analytics.list-${name}.json`,
+          {
+            type: 'application/json'
+          }
+        )
+
+        this.shdwDrive.uploadFile(
+          new PublicKey(this.project.shdw),
+          eventListFile
+        )
+      }
     }
 
     const id = uuidv4()
     const eventFile = new File(
-      [JSON.stringify(params)],
+      [JSON.stringify({ ...params, id })],
       `analytics.list-${name}.${id}.json`,
       {
         type: 'application/json'
@@ -208,7 +240,7 @@ export default class Analytics {
     await this.shdwDrive.uploadFile(new PublicKey(this.project.shdw), eventFile)
 
     const newEventListFile = new File(
-      [JSON.stringify([...response.data, { id, ts: Date.now() }])],
+      [JSON.stringify([...listData, { id, ts: params.ts || Date.now() }])],
       `analytics.list-${name}.json`,
       {
         type: 'application/json'
