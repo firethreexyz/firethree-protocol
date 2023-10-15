@@ -32,19 +32,20 @@ export default class Analytics {
   }
 
   private async getUserDataByIp() {
-    const response = await axios.get('https://ipinfo.io/json')
+    const response = await axios.get('http://ip-api.com/json')
 
-    if (!response.data) {
+    if (!response.data || response.data.status !== 'success') {
       return
     }
 
     const coord = response.data.loc.split(',')
 
     return {
-      lat: coord[0] as number,
-      lng: coord[1] as number,
+      lat: response.data.lat as number,
+      lng: response.data.lon as number,
       country: response.data.country as string,
-      postal: response.data.postal as string,
+      countryCode: response.data.countryCode as string,
+      zip: response.data.zip as string,
       region: response.data.region as string
     }
   }
@@ -119,9 +120,9 @@ export default class Analytics {
     ).length
 
     return {
-      daily,
-      weekly,
-      monthly
+      daily: Number(daily || 0),
+      weekly: Number(weekly || 0),
+      monthly: Number(monthly || 0)
     }
   }
 
@@ -138,8 +139,8 @@ export default class Analytics {
     )
 
     return {
-      users: usersResponse?.data?.length || 0,
-      views: viewsResponse?.data?.length || 0
+      users: Number(usersResponse?.data?.length || 0),
+      views: Number(viewsResponse?.data?.length || 0)
     }
   }
 

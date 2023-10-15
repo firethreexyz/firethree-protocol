@@ -44,5 +44,6 @@ export default class Firethree {
     this.project = new Project(this.program, this.wallet)
     this.collection = new Collection(this.program, this.wallet, project)
     this.storage = new Storage(this.program, this.wallet, project)
+    this.analytics = new Analytics(this.program, this.wallet, project)
   }
 }
