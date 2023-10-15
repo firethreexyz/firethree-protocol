@@ -2,7 +2,7 @@
   <h1>Firethree</h1>
 </div>
 
-The official firethree. Create your own solona dApp with collection, storage, analytics, hosting with this protocol using shadow drive and multisig!
+The official firethree. Create your own solona dApp with collection, storage, analytics with this protocol using shadow drive and multisig!
 
 ## Quick Setup
 

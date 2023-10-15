@@ -8,7 +8,6 @@ import { FIRETHREE_PROGRAM_ID } from './constants/program'
 import Auth from './auth'
 import Analytics from './analytics'
 import Collection from './collection'
-import Hosting from './hosting'
 import Storage from './storage'
 import Project from './project'
 
@@ -16,7 +15,6 @@ export default class Firethree {
   auth: Auth
   analytics: Analytics
   collection: Collection
-  hosting: Hosting
   storage: Storage
   project: Project
   program: Program<IFirethree>
