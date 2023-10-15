@@ -1,21 +1,16 @@
 import {
-  ConfirmOptions,
-  Connection,
   Keypair,
   PublicKey,
   TransactionMessage,
   VersionedTransaction
 } from '@solana/web3.js'
-import { AnchorProvider, Program } from '@coral-xyz/anchor'
+import { Program } from '@coral-xyz/anchor'
 import { Firethree } from './types/firethree'
-import IDL from './idl/firethree.json'
-import { FIRETHREE_PROGRAM_ID } from './constants/program'
 import { encodeName, decodeName } from './utils/name'
 import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
-import { ShdwDrive } from '@shadow-drive/sdk'
+import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
 import { Wallet } from './types/wallet'
-import { GENESYSGO_URL } from './constants/storage'
 
 export default class Poject {
   program: Program<Firethree>
@@ -76,7 +71,10 @@ export default class Poject {
       this.program.provider.connection,
       this.wallet
     ).init()
-    let storageAcc = []
+    let storageAcc: {
+      publicKey: PublicKey
+      account: StorageAccountV2
+    }[] = []
 
     try {
       storageAcc = await shdwDrive?.getStorageAccounts()
@@ -137,7 +135,7 @@ export default class Poject {
     )
 
     if (hasStorage) {
-      shdw = new PublicKey(hasStorage.account.storage)
+      shdw = new PublicKey(hasStorage.publicKey)
     }
 
     if (!hasStorage) {
@@ -178,7 +176,7 @@ export default class Poject {
       setupProjecTransactionSigned.serialize()
     )
 
-    const newFile = new File([image], `project-${name}`)
+    const newFile = new File([image], `project.logo-${name}`)
 
     await shdwDrive.uploadFile(shdw, newFile)
   }
