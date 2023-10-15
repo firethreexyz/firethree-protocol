@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid'
 import axios from 'axios'
 import shadowVerifyAccount from './utils/shadowVerifyAccount'
 import { GENESYSGO_URL } from './constants/storage'
-var cookies = require('browser-cookies')
 
 export default class Analytics {
   program: Program<Firethree>
@@ -64,24 +63,30 @@ export default class Analytics {
 
     const userDataByIp = await this.getUserDataByIp()
 
-    if (cookies.get('userId') && !cookies.get('locationTracked')) {
+    const locationTracked = localStorage.get('locationTracked')
+
+    if (
+      localStorage.get('userId') &&
+      locationTracked &&
+      Number(locationTracked) < Date.now() - 1 * 60 * 60 * 1000
+    ) {
       this.trackEvent('user_view', {})
 
       this.trackEvent('location', { ...userDataByIp })
-      cookies.set('locationTracked', true, { expires: 1 })
+      localStorage.set('locationTracked', Date.now())
     }
 
-    if (!cookies.get('userId')) {
+    if (!localStorage.get('userId')) {
       const id = uuidv4()
 
-      cookies.set('userId', id, { expires: 365 })
+      localStorage.set('userId', id)
       this.trackEvent('first_view', {
         ts: Date.now(),
         id
       })
 
-      cookies.set('locationTracked', true, { expires: 1 })
-      this.trackEvent('location', { ...userDataByIp })
+      localStorage.set('locationTracked', true)
+      localStorage.set('locationTracked', Date.now())
     }
   }
 
