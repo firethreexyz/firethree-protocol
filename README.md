@@ -2,7 +2,7 @@
   <h1>Firethree</h1>
 </div>
 
-The official firethree. Create your own solona dApp with collection, storage, analytics with this protocol using shadow drive and multisig!
+Create your own Solana dApp with collection, storage, analytics with this protocol. storage with @GenesysGo and multisig by @SquadsProtocol!
 
 ## Quick Setup
 
