@@ -11,8 +11,8 @@ import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
 import { Wallet } from './types/wallet'
-import { Project as IProject } from './types/project'
 import { getProjectPDA } from './utils/helpers'
+import { GENESYSGO_URL } from './constants/storage'
 
 export default class Poject {
   program: Program<Firethree>
@@ -24,7 +24,7 @@ export default class Poject {
   }
 
   /**
-   * Get a project
+   * Get a project by name
    *  @param name Project name
    */
   public async get(name: string) {
@@ -36,6 +36,39 @@ export default class Poject {
     )
 
     const project = await this.program.account.project.fetch(ProjectPDA)
+
+    return {
+      ...project,
+      name: decodeName(project.name),
+      ts: project.ts.toNumber()
+    }
+  }
+
+  /**
+   * Get all projects
+   */
+  public async getAll() {
+    const projects = await this.program.account.project.all()
+
+    return projects.map((project) => {
+      const name = decodeName(project.account.name)
+
+      return {
+        ...project,
+        name,
+        ts: project.account.ts.toNumber(),
+        publicKey: project.publicKey,
+        image: `${GENESYSGO_URL}/${project.account.shdw.toBase58()}/project-${name}`
+      }
+    })
+  }
+
+  /**
+   * Get a project by PDA
+   *  @param pda Project PDA
+   */
+  public async getProjectByPDA(pda: PublicKey) {
+    const project = await this.program.account.project.fetch(pda)
 
     return {
       ...project,
@@ -178,7 +211,7 @@ export default class Poject {
       setupProjecTransactionSigned.serialize()
     )
 
-    const newFile = new File([image], `project.logo-${name}`)
+    const newFile = new File([image], `project-${name}`)
 
     await shdwDrive.uploadFile(shdw, newFile)
   }

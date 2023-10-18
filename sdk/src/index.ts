@@ -26,7 +26,7 @@ export default class Firethree {
   constructor(
     project: IProject | null,
     connection: Connection,
-    wallet: Wallet,
+    wallet?: Wallet,
     opts?: ConfirmOptions
   ) {
     this.connection = connection
@@ -41,7 +41,7 @@ export default class Firethree {
 
     this.project = new Project(this.program, this.wallet)
 
-    if (!project) return
+    if (!project || !wallet) return
 
     this.collection = new Collection(this.program, this.wallet, project)
     this.storage = new Storage(this.program, this.wallet, project)
