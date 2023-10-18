@@ -9,7 +9,7 @@
     "clean": "rimraf dist",
     "build": "yarn run clean && tsc",
     "prepublishOnly": "yarn build",
-    "docs": "typedoc --excludePrivate --includeVersion --out ./docs src",
+    "docs": "typedoc --excludePrivate --includeVersion --out ./docs src/*",
     "start": "yarn build && node ./dist/index.js"
   },
   "repository": {
