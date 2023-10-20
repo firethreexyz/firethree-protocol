@@ -8,6 +8,7 @@ import shadowVerifyAccount from './utils/shadowVerifyAccount'
 import axios from 'axios'
 import { GENESYSGO_URL } from './constants/storage'
 import { v4 as uuidv4 } from 'uuid'
+import GENESYS_API from './utils/api'
 
 export default class Storage {
   program: Program<Firethree>
@@ -16,20 +17,16 @@ export default class Storage {
   shdwDrive: ShdwDrive
   shdwKey: PublicKey
 
-  constructor(program: Program<Firethree>, wallet: Wallet, project: Project) {
+  constructor(
+    program: Program<Firethree>,
+    wallet: Wallet,
+    shdwDrive: ShdwDrive,
+    project: Project
+  ) {
     this.program = program
     this.wallet = wallet
     this.project = project
-    this.shdwKey = new PublicKey(this.project.shdw)
-
-    this.init()
-  }
-
-  private async init() {
-    this.shdwDrive = await new ShdwDrive(
-      this.program.provider.connection,
-      this.wallet
-    ).init()
+    this.shdwDrive = shdwDrive
   }
 
   /**
@@ -87,9 +84,7 @@ export default class Storage {
   async getFile(filePath: string) {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
-    const response = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/${filePath}`
-    )
+    const response = await GENESYS_API.get(`/${this.project.shdw}/${filePath}`)
 
     if (!response.data) throw new Error('File not found')
 

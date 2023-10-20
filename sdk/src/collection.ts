@@ -8,6 +8,7 @@ import axios, { AxiosResponse } from 'axios'
 import { GENESYSGO_URL } from './constants/storage'
 import shadowVerifyAccount from './utils/shadowVerifyAccount'
 import verifyCollection from './utils/verifyCollection'
+import GENESYS_API from './utils/api'
 const UUID = require('uuid')
 
 export default class Collection {
@@ -16,19 +17,16 @@ export default class Collection {
   project: Project
   shdwDrive: ShdwDrive
 
-  constructor(program: Program<Firethree>, wallet: Wallet, project: Project) {
+  constructor(
+    program: Program<Firethree>,
+    wallet: Wallet,
+    shdwDrive: ShdwDrive,
+    project: Project
+  ) {
     this.program = program
     this.wallet = wallet
     this.project = project
-
-    this.init()
-  }
-
-  private async init() {
-    this.shdwDrive = await new ShdwDrive(
-      this.program.provider.connection,
-      this.wallet
-    ).init()
+    this.shdwDrive = shdwDrive
   }
 
   /**
@@ -184,8 +182,8 @@ export default class Collection {
     })
 
     const collectionPrefix = newPrefixes.join('.')
-    const collectionResponse: AxiosResponse<T> = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`
+    const collectionResponse: AxiosResponse<T> = await GENESYS_API.get(
+      `/${this.project.shdw}/collection-${collectionPrefix}.json`
     )
 
     if (!collectionResponse.data) {
@@ -206,8 +204,8 @@ export default class Collection {
     let docReponse
 
     try {
-      docReponse = await axios.get(
-        `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
+      docReponse = await GENESYS_API.get(
+        `/${this.project.shdw}/doc-${name}.json`
       )
     } catch (error) {}
 
@@ -265,8 +263,8 @@ export default class Collection {
   public async getDoc({ name, id }: { name: string; id: string }) {
     shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
-    const response = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`
+    const response = await GENESYS_API.get(
+      `/${this.project.shdw}/doc-${name}.${id}.json`
     )
 
     return {
@@ -310,8 +308,8 @@ export default class Collection {
     })
 
     const collectionPrefix = newPrefixes.join('.')
-    const collectionResponse: AxiosResponse<T> = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`
+    const collectionResponse: AxiosResponse<T> = await GENESYS_API.get(
+      `/${this.project.shdw}/collection-${collectionPrefix}.json`
     )
 
     if (!collectionResponse.data) {
@@ -324,8 +322,8 @@ export default class Collection {
 
     if (!isValidCollection) return
 
-    const dataReponse = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`
+    const dataReponse = await GENESYS_API.get(
+      `/${this.project.shdw}/doc-${name}.${id}.json`
     )
 
     let doc = {
@@ -363,7 +361,7 @@ export default class Collection {
       throw new Error('You must provide an ID to delete a document')
     }
 
-    const dataReponse = await axios.get(
+    const dataReponse = await GENESYS_API.get(
       `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
     )
 

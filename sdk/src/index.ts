@@ -10,6 +10,7 @@ import Analytics from './analytics'
 import Collection from './collection'
 import Storage from './storage'
 import Project from './project'
+import { ShdwDrive } from '@shadow-drive/sdk'
 
 export default class Firethree {
   auth: Auth
@@ -23,12 +24,7 @@ export default class Firethree {
   wallet: Wallet
   opts: ConfirmOptions
 
-  constructor(
-    project: IProject | null,
-    connection: Connection,
-    wallet?: Wallet,
-    opts?: ConfirmOptions
-  ) {
+  constructor(connection: Connection, wallet?: Wallet, opts?: ConfirmOptions) {
     this.connection = connection
     this.wallet = wallet
     this.opts = opts || AnchorProvider.defaultOptions()
@@ -40,11 +36,30 @@ export default class Firethree {
     )
 
     this.project = new Project(this.program, this.wallet)
+  }
 
-    if (!project || !wallet) return
+  async init(projectName: string) {
+    const project = await this.project.get(projectName)
 
-    this.collection = new Collection(this.program, this.wallet, project)
-    this.storage = new Storage(this.program, this.wallet, project)
-    this.analytics = new Analytics(this.program, this.wallet, project)
+    const shdwDrive = await new ShdwDrive(
+      this.program.provider.connection,
+      this.wallet
+    ).init()
+
+    this.collection = new Collection(
+      this.program,
+      this.wallet,
+      shdwDrive,
+      project
+    )
+    this.storage = new Storage(this.program, this.wallet, shdwDrive, project)
+    this.analytics = new Analytics(
+      this.program,
+      this.wallet,
+      shdwDrive,
+      project
+    )
+
+    return this
   }
 }

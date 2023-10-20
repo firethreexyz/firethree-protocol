@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 import axios from 'axios'
 import shadowVerifyAccount from './utils/shadowVerifyAccount'
 import { GENESYSGO_URL } from './constants/storage'
+import GENESYS_API from './utils/api'
 
 export default class Analytics {
   program: Program<Firethree>
@@ -15,19 +16,16 @@ export default class Analytics {
   project: Project
   shdwDrive: ShdwDrive
 
-  constructor(program: Program<Firethree>, wallet: Wallet, project: Project) {
+  constructor(
+    program: Program<Firethree>,
+    wallet: Wallet,
+    shdwDrive: ShdwDrive,
+    project: Project
+  ) {
     this.program = program
     this.wallet = wallet
     this.project = project
-
-    this.initShdwDrive()
-  }
-
-  private async initShdwDrive() {
-    this.shdwDrive = await new ShdwDrive(
-      this.program.provider.connection,
-      this.wallet
-    ).init()
+    this.shdwDrive = shdwDrive
   }
 
   private async getUserDataByIp() {
@@ -96,8 +94,8 @@ export default class Analytics {
    * Get Number of Users
    */
   public async getNumberOfUsers() {
-    const response = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-user_view.json`
+    const response = await GENESYS_API.get(
+      `/${this.project.shdw}/analytics.list-user_view.json`
     )
 
     if (response.status === 404) {
@@ -135,12 +133,12 @@ export default class Analytics {
    * Get Statistics
    */
   public async getStatistics() {
-    const viewsResponse = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-page_view.json`
+    const viewsResponse = await GENESYS_API.get(
+      `/${this.project.shdw}/analytics.list-page_view.json`
     )
 
-    const usersResponse = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-user_view.json`
+    const usersResponse = await GENESYS_API.get(
+      `/${this.project.shdw}/analytics.list-user_view.json`
     )
 
     return {
@@ -169,8 +167,8 @@ export default class Analytics {
           return null
         }
 
-        const eventResponse = await axios.get(
-          `${GENESYSGO_URL}/${this.project.shdw}/${event}`
+        const eventResponse = await GENESYS_API.get(
+          `/${this.project.shdw}/${event}`
         )
 
         return {
@@ -188,8 +186,8 @@ export default class Analytics {
    * @param name Name of the event
    */
   public async getEventsByName(name: string) {
-    const response = await axios.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-${name}.json`
+    const response = await GENESYS_API.get(
+      `/${this.project.shdw}/analytics.list-${name}.json`
     )
 
     return response.data
@@ -206,8 +204,8 @@ export default class Analytics {
     let listData: { ts: number; id: string }[] = []
 
     try {
-      const response = await axios.get(
-        `${GENESYSGO_URL}/${this.project.shdw}/analytics.list-${name}.json`
+      const response = await GENESYS_API.get(
+        `/${this.project.shdw}/analytics.list-${name}.json`
       )
 
       listData = response.data

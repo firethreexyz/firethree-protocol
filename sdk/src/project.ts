@@ -13,6 +13,7 @@ import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
 import { Wallet } from './types/wallet'
 import { getProjectPDA } from './utils/helpers'
 import { GENESYSGO_URL } from './constants/storage'
+import { Project as IProject } from './types/project'
 
 export default class Poject {
   program: Program<Firethree>
@@ -27,7 +28,7 @@ export default class Poject {
    * Get a project by name
    *  @param name Project name
    */
-  public async get(name: string) {
+  public async get(name: string): Promise<IProject> {
     const projectName = encodeName(name)
 
     const [ProjectPDA] = PublicKey.findProgramAddressSync(
@@ -44,6 +45,30 @@ export default class Poject {
     }
   }
 
+  public async getProjectsByUserPublicKey(publicKey: PublicKey) {
+    const allProjects = await this.program.account.project.all()
+
+    const projects = allProjects.filter((project) => {
+      return project.account.authority.equals(publicKey)
+    })
+
+    if (!projects) {
+      return []
+    }
+
+    return projects.map((project) => {
+      const name = decodeName(project.account.name)
+
+      return {
+        ...project.account,
+        name,
+        ts: project.account.ts.toNumber(),
+        publicKey: project.publicKey,
+        image: `${GENESYSGO_URL}/${project.account.shdw.toBase58()}/project-${name}`
+      }
+    })
+  }
+
   /**
    * Get all projects
    */
@@ -54,7 +79,7 @@ export default class Poject {
       const name = decodeName(project.account.name)
 
       return {
-        ...project,
+        ...project.account,
         name,
         ts: project.account.ts.toNumber(),
         publicKey: project.publicKey,
@@ -70,10 +95,13 @@ export default class Poject {
   public async getProjectByPDA(pda: PublicKey) {
     const project = await this.program.account.project.fetch(pda)
 
+    const name = decodeName(project.name)
+
     return {
       ...project,
-      name: decodeName(project.name),
-      ts: project.ts.toNumber()
+      name,
+      ts: project.ts.toNumber(),
+      image: `${GENESYSGO_URL}/${project.shdw.toBase58()}/project-${name}`
     }
   }
 
@@ -247,15 +275,7 @@ export default class Poject {
    * Delete a project
    *  @param name Project name
    */
-  public async deleteProject({
-    name
-  }: {
-    name: string
-    creator: PublicKey
-    members: PublicKey[]
-    threshold: number
-    shdwSize: string
-  }) {
+  public async deleteProject({ name }: { name: string }) {
     const project = await this.get(name)
 
     const ProjectPDA = getProjectPDA(name, this.program.programId)
