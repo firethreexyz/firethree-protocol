@@ -4,6 +4,9 @@
 
 Create your own Solana dApp with collection, storage, analytics with this protocol. storage with @GenesysGo and multisig by @SquadsProtocol!
 
+### Docs
+https://firethreexyz.github.io/firethree-protocol/
+
 ## Quick Setup
 
 ### Install
