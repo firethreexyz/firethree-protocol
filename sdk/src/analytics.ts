@@ -199,8 +199,6 @@ export default class Analytics {
    * @param params Parameters of the event (e.g. { id: 1 })
    */
   public async trackEvent(name: string, params: { [key: string]: any }) {
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
-
     let listData: { ts: number; id: string }[] = []
 
     try {

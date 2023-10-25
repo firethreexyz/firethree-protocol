@@ -1,7 +1,6 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { ConfirmOptions, Connection } from '@solana/web3.js'
 import { Wallet } from './types/wallet'
-import { Project as IProject } from './types/project'
 import { Firethree as IFirethree } from './types/firethree'
 import IDL from './idl/firethree.json'
 import { FIRETHREE_PROGRAM_ID } from './constants/program'

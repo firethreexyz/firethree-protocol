@@ -5,7 +5,6 @@ import { ShdwDrive } from '@shadow-drive/sdk'
 import { PublicKey } from '@solana/web3.js'
 import { Project } from './types/project'
 import shadowVerifyAccount from './utils/shadowVerifyAccount'
-import axios from 'axios'
 import { GENESYSGO_URL } from './constants/storage'
 import { v4 as uuidv4 } from 'uuid'
 import GENESYS_API from './utils/api'
@@ -35,8 +34,6 @@ export default class Storage {
    * @param files List of files to be uploaded
    */
   public async addMultipleFiles(folder: string, files: FileList) {
-    shadowVerifyAccount(this.shdwDrive, this.shdwKey)
-
     const dataTransfer = new DataTransfer()
 
     const replaceFolder = folder.replace('/', '-')
@@ -62,8 +59,6 @@ export default class Storage {
    * @param files File to be uploaded
    */
   public async addFile(folder: string, file: File) {
-    shadowVerifyAccount(this.shdwDrive, this.shdwKey)
-
     const replaceFolder = folder.replace('/', '-')
 
     const newFile = new File(
@@ -82,8 +77,6 @@ export default class Storage {
    * @param filePath File Path
    */
   async getFile(filePath: string) {
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
-
     const response = await GENESYS_API.get(`/${this.project.shdw}/${filePath}`)
 
     if (!response.data) throw new Error('File not found')
@@ -126,8 +119,6 @@ export default class Storage {
     if (!filePath) {
       throw new Error('You must provide an filePath to edit a document')
     }
-
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
 
     const file = new File([newFile], `${filePath}`, {
       type: newFile.type

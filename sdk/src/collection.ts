@@ -33,8 +33,6 @@ export default class Collection {
    * Get all files in a project
    */
   public async getAllFiles() {
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
-
     const response = await this.shdwDrive.listObjects(
       new PublicKey(this.project.shdw)
     )
@@ -64,8 +62,6 @@ export default class Collection {
     name: string
     structure: T
   }) {
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
-
     const structureFile = new File(
       [
         JSON.stringify({
@@ -129,8 +125,6 @@ export default class Collection {
     name: string
     structure: T
   }) {
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
-
     const structureFile = new File(
       [
         JSON.stringify({
@@ -166,8 +160,6 @@ export default class Collection {
    *
    */
   public async addDoc<T>({ name, data }: { name: string; data: T }) {
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
-
     let prefixes = name.split('.')
     let newPrefixes = []
 
@@ -261,8 +253,6 @@ export default class Collection {
    *
    */
   public async getDoc({ name, id }: { name: string; id: string }) {
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
-
     const response = await GENESYS_API.get(
       `/${this.project.shdw}/doc-${name}.${id}.json`
     )
@@ -293,7 +283,6 @@ export default class Collection {
       throw new Error('You must provide an ID to edit a document')
     }
 
-    shadowVerifyAccount(this.shdwDrive, this.project.shdw)
     let prefixes = name.split('.')
     let newPrefixes = []
 
