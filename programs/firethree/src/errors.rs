@@ -4,4 +4,6 @@ use anchor_lang::prelude::*;
 pub enum FirethreeError {
     #[msg("Unauthorized to delete the project")]
     UnauthorizedToDeleteProject,
+    #[msg("Invalid shadow account")]
+    InvalidShadowAccount,
 }

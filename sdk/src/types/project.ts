@@ -7,7 +7,5 @@ export type Project = {
   image?: string
   bump: number
   shdw: PublicKey
-  multisig: PublicKey
   authority: PublicKey
-  createKey: PublicKey
 }

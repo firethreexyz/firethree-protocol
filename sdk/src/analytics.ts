@@ -1,12 +1,10 @@
 import { PublicKey } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
+import { Program, Wallet } from '@coral-xyz/anchor'
 import { Firethree } from './types/firethree'
-import { Wallet } from './types/wallet'
 import { Project } from './types/project'
 import { ShdwDrive } from '@shadow-drive/sdk'
 import { v4 as uuidv4 } from 'uuid'
 import axios from 'axios'
-import shadowVerifyAccount from './utils/shadowVerifyAccount'
 import { GENESYSGO_URL } from './constants/storage'
 import GENESYS_API from './utils/api'
 

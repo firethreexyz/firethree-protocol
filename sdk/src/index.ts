@@ -1,10 +1,8 @@
-import { AnchorProvider, Program } from '@coral-xyz/anchor'
+import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { ConfirmOptions, Connection } from '@solana/web3.js'
-import { Wallet } from './types/wallet'
 import { Firethree as IFirethree } from './types/firethree'
 import IDL from './idl/firethree.json'
 import { FIRETHREE_PROGRAM_ID } from './constants/program'
-import Auth from './auth'
 import Analytics from './analytics'
 import Collection from './collection'
 import Storage from './storage'
@@ -12,7 +10,6 @@ import Project from './project'
 import { ShdwDrive } from '@shadow-drive/sdk'
 
 export default class Firethree {
-  auth: Auth
   analytics: Analytics
   collection: Collection
   storage: Storage

@@ -98,15 +98,7 @@ export type Firethree = {
             type: 'publicKey'
           },
           {
-            name: 'multisig'
-            type: 'publicKey'
-          },
-          {
             name: 'authority'
-            type: 'publicKey'
-          },
-          {
-            name: 'createKey'
             type: 'publicKey'
           }
         ]
@@ -131,14 +123,6 @@ export type Firethree = {
             type: {
               array: ['u8', 32]
             }
-          },
-          {
-            name: 'multisig'
-            type: 'publicKey'
-          },
-          {
-            name: 'createKey'
-            type: 'publicKey'
           },
           {
             name: 'shdw'
@@ -257,15 +241,7 @@ export const IDL: Firethree = {
             type: 'publicKey'
           },
           {
-            name: 'multisig',
-            type: 'publicKey'
-          },
-          {
             name: 'authority',
-            type: 'publicKey'
-          },
-          {
-            name: 'createKey',
             type: 'publicKey'
           }
         ]
@@ -290,14 +266,6 @@ export const IDL: Firethree = {
             type: {
               array: ['u8', 32]
             }
-          },
-          {
-            name: 'multisig',
-            type: 'publicKey'
-          },
-          {
-            name: 'createKey',
-            type: 'publicKey'
           },
           {
             name: 'shdw',

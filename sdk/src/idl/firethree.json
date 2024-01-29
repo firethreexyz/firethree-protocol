@@ -101,15 +101,7 @@
             "type": "publicKey"
           },
           {
-            "name": "multisig",
-            "type": "publicKey"
-          },
-          {
             "name": "authority",
-            "type": "publicKey"
-          },
-          {
-            "name": "createKey",
             "type": "publicKey"
           }
         ]
@@ -137,14 +129,6 @@
                 32
               ]
             }
-          },
-          {
-            "name": "multisig",
-            "type": "publicKey"
-          },
-          {
-            "name": "createKey",
-            "type": "publicKey"
           },
           {
             "name": "shdw",

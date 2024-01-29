@@ -4,13 +4,12 @@ import {
   TransactionMessage,
   VersionedTransaction
 } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
+import { Program, Wallet } from '@coral-xyz/anchor'
 import { Firethree } from './types/firethree'
 import { encodeName, decodeName } from './utils/name'
 import * as multisig from '@sqds/multisig'
 import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
-import { Wallet } from './types/wallet'
 import { getProjectPDA } from './utils/helpers'
 import { GENESYSGO_URL } from './constants/storage'
 import { Project as IProject } from './types/project'
@@ -213,9 +212,7 @@ export default class Poject {
     const setupProjectIx = await this.program.methods
       .projectCreate({
         name: projectName,
-        shdw,
-        multisig: MultisigPda,
-        createKey: createKey.publicKey
+        shdw
       })
       .accounts({
         payer: this.wallet.publicKey,
@@ -245,48 +242,11 @@ export default class Poject {
   }
 
   /**
-   * Add new Member
-   *  @param name Project name
-   */
-  public async addMember(name: string, member: PublicKey) {
-    const project = await this.get(name)
-
-    const connection = this.program.provider.connection
-    const { blockhash } = await connection.getLatestBlockhash()
-
-    const tx = multisig.transactions.multisigAddMember({
-      blockhash,
-      feePayer: this.wallet.publicKey,
-      multisigPda: new PublicKey(project.multisig),
-      configAuthority: this.wallet.publicKey,
-      rentPayer: this.wallet.publicKey,
-      newMember: {
-        key: member,
-        permissions: Permissions.all()
-      }
-    })
-
-    const txSigned = await this.wallet.signTransaction(tx)
-
-    await connection.sendRawTransaction(txSigned.serialize())
-  }
-
-  /**
    * Delete a project
    *  @param name Project name
    */
   public async deleteProject({ name }: { name: string }) {
-    const project = await this.get(name)
-
     const ProjectPDA = getProjectPDA(name, this.program.programId)
-
-    const [MultisigPda] = multisig.getMultisigPda({
-      createKey: project.createKey
-    })
-    const [VaultPda] = multisig.getVaultPda({
-      multisigPda: MultisigPda,
-      index: 0
-    })
 
     const ix = await this.program.methods
       .projectDelete()
@@ -299,42 +259,10 @@ export default class Poject {
     const connection = this.program.provider.connection
     const { blockhash } = await connection.getLatestBlockhash()
 
-    const txMessage = new TransactionMessage({
-      payerKey: this.wallet.publicKey,
-      recentBlockhash: blockhash,
-      instructions: [ix]
-    })
-
-    const multisigAccount = await multisig.accounts.Multisig.fromAccountAddress(
-      connection,
-      MultisigPda
-    )
-
-    const lastTransactionIndex = multisig.utils.toBigInt(
-      multisigAccount.transactionIndex
-    )
-
-    const txIndex = BigInt(Number(lastTransactionIndex.toString()) + 1)
-    const vaultIx = multisig.instructions.vaultTransactionCreate({
-      multisigPda: MultisigPda,
-      transactionIndex: txIndex,
-      creator: this.wallet.publicKey,
-      vaultIndex: 0,
-      ephemeralSigners: 0,
-      transactionMessage: txMessage,
-      memo: 'Resquest and delete project'
-    })
-
-    const proposalIx = multisig.instructions.proposalCreate({
-      multisigPda: MultisigPda,
-      transactionIndex: txIndex,
-      creator: this.wallet.publicKey
-    })
-
     const message = new TransactionMessage({
       payerKey: this.wallet.publicKey,
       recentBlockhash: blockhash,
-      instructions: [vaultIx, proposalIx]
+      instructions: [ix]
     }).compileToV0Message()
 
     const txSigned = await this.wallet.signTransaction(
