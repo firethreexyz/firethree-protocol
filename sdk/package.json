@@ -1,7 +1,7 @@
 {
   "name": "@firethreexyz/firethree-protocol",
-  "version": "0.18.5",
-  "description": "The official firethree. Create your own solona dApp with collection, storage, analytics with this protocol using shadow drive and multisig!",
+  "version": "0.18.6",
+  "description": "The official firethree. Create your own solona dApp with collection, storage, analytics with this protocol using shadow drive!",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -33,7 +33,6 @@
     "web3 collection",
     "web3 storage",
     "web3 analytics",
-    "multisig squads",
     "GenesysGO shadow drive"
   ],
   "author": "Firethree",
