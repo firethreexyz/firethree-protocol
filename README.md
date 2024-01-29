@@ -2,7 +2,7 @@
   <h1>Firethree</h1>
 </div>
 
-Create your own Solana dApp with collection, storage, analytics with this protocol. storage with @GenesysGo and multisig by @SquadsProtocol!
+Create your own Solana dApp with collection, storage, analytics with this protocol. storaged by @GenesysGo!
 
 ### Docs
 https://firethreexyz.github.io/firethree-protocol/
