@@ -26,18 +26,3 @@ yarn:
 ```shell
 yarn add @firethreexyz/firethree-protocol
 ```
-
-### Build From Source
-
-1. Clone the project:
-
-```shell
-git clone https://github.com/firethreexyz/firethree-protocol.git
-```
-
-2. Install dependencies:
-
-```shell
-cd firethree-protocol
-npm install
-```
