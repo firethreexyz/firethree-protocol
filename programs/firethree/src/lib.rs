@@ -1,9 +1,12 @@
 use anchor_lang::prelude::*;
 
-pub use instructions::*;
+use instructions::*;
+use state::*;
 
-pub mod errors;
-pub mod instructions;
+mod cpi;
+mod errors;
+mod instructions;
+mod state;
 
 declare_id!("Fire3T9ABT33UYoVJZwWUnbPR3rgoVw98y82UgHZ8Bm");
 
@@ -12,15 +15,26 @@ pub mod firethree {
 
     use super::*;
 
-    pub fn project_create(ctx: Context<ProjectCreate>, args: ProjectArgs) -> Result<()> {
-        ProjectCreate::project_create(ctx, args)
+    pub fn create_project(ctx: Context<CreateProject>, args: CreateProjectArgs) -> Result<()> {
+        instructions::create_project(ctx, args)
     }
 
-    pub fn project_delete(ctx: Context<ProjectDelete>) -> Result<()> {
-        ProjectDelete::project_delete(ctx)
+    pub fn delete_project(ctx: Context<DeleteProject>) -> Result<()> {
+        instructions::delete_project(ctx)
     }
 
-    pub fn user_create(ctx: Context<UserCreate>) -> Result<()> {
-        UserCreate::user_create(ctx)
+    pub fn create_vault(ctx: Context<CreateVault>, args: CreateVaultArgs) -> Result<()> {
+        instructions::create_vault(ctx, args)
+    }
+
+    pub fn deposit<'info>(
+        ctx: Context<'_, '_, '_, 'info, Deposit<'info>>,
+        amount: u64,
+    ) -> Result<()> {
+        instructions::deposit(ctx, amount)
+    }
+
+    pub fn create_vault_depositor(ctx: Context<CreateVaultDepositor>) -> Result<()> {
+        instructions::create_vault_depositor(ctx)
     }
 }

@@ -1,12 +1,12 @@
 import { PublicKey } from '@solana/web3.js'
 import { Program, Wallet } from '@coral-xyz/anchor'
-import { Firethree } from './types/firethree'
-import { Project } from './types/project'
+import { Firethree } from '../types/firethree'
+import { Project } from '../types/project'
 import { ShdwDrive } from '@shadow-drive/sdk'
 import { v4 as uuidv4 } from 'uuid'
 import axios from 'axios'
-import { GENESYSGO_URL } from './constants/storage'
-import GENESYS_API from './utils/api'
+import { GENESYSGO_URL } from '../constants/storage'
+import GENESYS_API from '../utils/api'
 
 export default class Analytics {
   program: Program<Firethree>

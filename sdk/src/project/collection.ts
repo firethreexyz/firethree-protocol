@@ -1,12 +1,12 @@
 import { Program, Wallet } from '@coral-xyz/anchor'
-import { Firethree } from './types/firethree'
+import { Firethree } from '../types/firethree'
 import { ShdwDrive } from '@shadow-drive/sdk'
-import { Project } from './types/project'
+import { Project } from '../types/project'
 import { PublicKey } from '@solana/web3.js'
 import { AxiosResponse } from 'axios'
-import { GENESYSGO_URL } from './constants/storage'
-import verifyCollection from './utils/verifyCollection'
-import GENESYS_API from './utils/api'
+import { GENESYSGO_URL } from '../constants/storage'
+import verifyCollection from '../utils/verifyCollection'
+import GENESYS_API from '../utils/api'
 const UUID = require('uuid')
 
 export default class Collection {

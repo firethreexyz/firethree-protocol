@@ -1,26 +1,71 @@
+import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { Connection } from '@solana/web3.js'
+import { IDL, Firethree } from './../types/firethree'
+import { FIRETHREE_PROGRAM_ID } from './../constants/program'
+import Analytics from './analytics'
+import Collection from './collection'
+import Storage from './storage'
+import { encodeName, decodeName } from '../utils/name'
+import * as multisig from '@sqds/multisig'
+import { Permission, Permissions } from '@sqds/multisig/lib/types'
+import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
+import { getProjectPDA } from '../utils/helpers'
+import { GENESYSGO_URL } from '../constants/storage'
+import { Project as IProject } from '../types/project'
 import {
   Keypair,
   PublicKey,
   TransactionMessage,
   VersionedTransaction
 } from '@solana/web3.js'
-import { Program, Wallet } from '@coral-xyz/anchor'
-import { Firethree } from './types/firethree'
-import { encodeName, decodeName } from './utils/name'
-import * as multisig from '@sqds/multisig'
-import { Permission, Permissions } from '@sqds/multisig/lib/types'
-import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
-import { getProjectPDA } from './utils/helpers'
-import { GENESYSGO_URL } from './constants/storage'
-import { Project as IProject } from './types/project'
 
-export default class Poject {
+export default class Project {
+  analytics: Analytics
+  collection: Collection
+  storage: Storage
   program: Program<Firethree>
+  provider: AnchorProvider
+  connection: Connection
   wallet: Wallet
 
-  constructor(program: Program<Firethree>, wallet: Wallet) {
-    this.program = program
+  constructor(connection: Connection, wallet: Wallet) {
+    this.connection = connection
     this.wallet = wallet
+    this.provider = new AnchorProvider(
+      this.connection,
+      this.wallet,
+      AnchorProvider.defaultOptions()
+    )
+    this.program = new Program<Firethree>(
+      IDL,
+      FIRETHREE_PROGRAM_ID,
+      this.provider
+    )
+  }
+
+  async init(projectName: string) {
+    const project = await this.get(projectName)
+
+    const shdwDrive = await new ShdwDrive(
+      this.program.provider.connection,
+      this.wallet
+    ).init()
+
+    this.collection = new Collection(
+      this.program,
+      this.wallet,
+      shdwDrive,
+      project
+    )
+    this.storage = new Storage(this.program, this.wallet, shdwDrive, project)
+    this.analytics = new Analytics(
+      this.program,
+      this.wallet,
+      shdwDrive,
+      project
+    )
+
+    return this
   }
 
   /**
@@ -210,12 +255,12 @@ export default class Poject {
     }
 
     const setupProjectIx = await this.program.methods
-      .projectCreate({
+      .createProject({
         name: projectName,
         shdw
       })
       .accounts({
-        payer: this.wallet.publicKey,
+        signer: this.wallet.publicKey,
         project: ProjectPDA
       })
       .instruction()
@@ -249,7 +294,7 @@ export default class Poject {
     const ProjectPDA = getProjectPDA(name, this.program.programId)
 
     const ix = await this.program.methods
-      .projectDelete()
+      .deleteProject()
       .accounts({
         project: ProjectPDA,
         authority: this.wallet.publicKey

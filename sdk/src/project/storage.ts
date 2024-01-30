@@ -1,11 +1,11 @@
 import { Program, Wallet } from '@coral-xyz/anchor'
-import { Firethree } from './types/firethree'
+import { Firethree } from '../types/firethree'
 import { ShdwDrive } from '@shadow-drive/sdk'
 import { PublicKey } from '@solana/web3.js'
-import { Project } from './types/project'
-import { GENESYSGO_URL } from './constants/storage'
+import { Project } from '../types/project'
+import { GENESYSGO_URL } from '../constants/storage'
 import { v4 as uuidv4 } from 'uuid'
-import GENESYS_API from './utils/api'
+import GENESYS_API from '../utils/api'
 
 export default class Storage {
   program: Program<Firethree>

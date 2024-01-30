@@ -3,10 +3,10 @@ export type Firethree = {
   name: 'firethree'
   instructions: [
     {
-      name: 'projectCreate'
+      name: 'createProject'
       accounts: [
         {
-          name: 'payer'
+          name: 'signer'
           isMut: true
           isSigner: true
         },
@@ -25,13 +25,13 @@ export type Firethree = {
         {
           name: 'args'
           type: {
-            defined: 'ProjectArgs'
+            defined: 'CreateProjectArgs'
           }
         }
       ]
     },
     {
-      name: 'projectDelete'
+      name: 'deleteProject'
       accounts: [
         {
           name: 'authority'
@@ -47,20 +47,114 @@ export type Firethree = {
       args: []
     },
     {
-      name: 'userCreate'
+      name: 'createVault'
       accounts: [
         {
-          name: 'payer'
+          name: 'signer'
           isMut: true
           isSigner: true
         },
         {
-          name: 'user'
+          name: 'vault'
           isMut: true
           isSigner: false
         },
         {
-          name: 'project'
+          name: 'payerTokenMint'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'tokenAccount'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'triadSigner'
+          isMut: false
+          isSigner: true
+        },
+        {
+          name: 'systemProgram'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'tokenProgram'
+          isMut: false
+          isSigner: false
+        }
+      ]
+      args: [
+        {
+          name: 'args'
+          type: {
+            defined: 'CreateVaultArgs'
+          }
+        }
+      ]
+    },
+    {
+      name: 'deposit'
+      accounts: [
+        {
+          name: 'signer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'vault'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'depositor'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'vaultTokenAccount'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'userTokenAccount'
+          isMut: true
+          isSigner: false
+        },
+        {
+          name: 'systemProgram'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'tokenProgram'
+          isMut: false
+          isSigner: false
+        }
+      ]
+      args: [
+        {
+          name: 'amount'
+          type: 'u64'
+        }
+      ]
+    },
+    {
+      name: 'createVaultDepositor'
+      accounts: [
+        {
+          name: 'signer'
+          isMut: true
+          isSigner: true
+        },
+        {
+          name: 'vault'
+          isMut: false
+          isSigner: false
+        },
+        {
+          name: 'vaultDepositor'
           isMut: true
           isSigner: false
         },
@@ -105,16 +199,71 @@ export type Firethree = {
       }
     },
     {
-      name: 'user'
+      name: 'vault'
       type: {
         kind: 'struct'
-        fields: []
+        fields: [
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'publicKey'
+          },
+          {
+            name: 'name'
+            type: {
+              array: ['u8', 32]
+            }
+          },
+          {
+            name: 'tokenAccount'
+            type: 'publicKey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'vaultDepositor'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'bump'
+            type: 'u8'
+          },
+          {
+            name: 'authority'
+            type: 'publicKey'
+          },
+          {
+            name: 'vault'
+            type: 'publicKey'
+          },
+          {
+            name: 'totalDeposit'
+            type: 'u64'
+          },
+          {
+            name: 'totalWithdrawal'
+            type: 'u64'
+          },
+          {
+            name: 'netDeposit'
+            type: 'i64'
+          },
+          {
+            name: 'lpShares'
+            type: 'u64'
+          }
+        ]
       }
     }
   ]
   types: [
     {
-      name: 'ProjectArgs'
+      name: 'CreateProjectArgs'
       type: {
         kind: 'struct'
         fields: [
@@ -130,6 +279,20 @@ export type Firethree = {
           }
         ]
       }
+    },
+    {
+      name: 'CreateVaultArgs'
+      type: {
+        kind: 'struct'
+        fields: [
+          {
+            name: 'name'
+            type: {
+              array: ['u8', 32]
+            }
+          }
+        ]
+      }
     }
   ]
   errors: [
@@ -137,6 +300,41 @@ export type Firethree = {
       code: 6000
       name: 'UnauthorizedToDeleteProject'
       msg: 'Unauthorized to delete the project'
+    },
+    {
+      code: 6001
+      name: 'InvalidShadowAccount'
+      msg: 'Invalid shadow account'
+    },
+    {
+      code: 6002
+      name: 'InvalidAccount'
+      msg: 'Invalid account'
+    },
+    {
+      code: 6003
+      name: 'Unauthorized'
+      msg: 'Unauthorized access'
+    },
+    {
+      code: 6004
+      name: 'InvalidPassType'
+      msg: 'Invalid pass type'
+    },
+    {
+      code: 6005
+      name: 'InvalidVaultDepositorAuthority'
+      msg: 'Invalid vault depositor authority'
+    },
+    {
+      code: 6006
+      name: 'InvalidOwnerAuthority'
+      msg: 'Invalid owner authority'
+    },
+    {
+      code: 6007
+      name: 'InvalidMintAddress'
+      msg: 'Invalid mint address'
     }
   ]
 }
@@ -146,10 +344,10 @@ export const IDL: Firethree = {
   name: 'firethree',
   instructions: [
     {
-      name: 'projectCreate',
+      name: 'createProject',
       accounts: [
         {
-          name: 'payer',
+          name: 'signer',
           isMut: true,
           isSigner: true
         },
@@ -168,13 +366,13 @@ export const IDL: Firethree = {
         {
           name: 'args',
           type: {
-            defined: 'ProjectArgs'
+            defined: 'CreateProjectArgs'
           }
         }
       ]
     },
     {
-      name: 'projectDelete',
+      name: 'deleteProject',
       accounts: [
         {
           name: 'authority',
@@ -190,20 +388,114 @@ export const IDL: Firethree = {
       args: []
     },
     {
-      name: 'userCreate',
+      name: 'createVault',
       accounts: [
         {
-          name: 'payer',
+          name: 'signer',
           isMut: true,
           isSigner: true
         },
         {
-          name: 'user',
+          name: 'vault',
           isMut: true,
           isSigner: false
         },
         {
-          name: 'project',
+          name: 'payerTokenMint',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'tokenAccount',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'triadSigner',
+          isMut: false,
+          isSigner: true
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'tokenProgram',
+          isMut: false,
+          isSigner: false
+        }
+      ],
+      args: [
+        {
+          name: 'args',
+          type: {
+            defined: 'CreateVaultArgs'
+          }
+        }
+      ]
+    },
+    {
+      name: 'deposit',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'vault',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'depositor',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'vaultTokenAccount',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'userTokenAccount',
+          isMut: true,
+          isSigner: false
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'tokenProgram',
+          isMut: false,
+          isSigner: false
+        }
+      ],
+      args: [
+        {
+          name: 'amount',
+          type: 'u64'
+        }
+      ]
+    },
+    {
+      name: 'createVaultDepositor',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true
+        },
+        {
+          name: 'vault',
+          isMut: false,
+          isSigner: false
+        },
+        {
+          name: 'vaultDepositor',
           isMut: true,
           isSigner: false
         },
@@ -248,16 +540,71 @@ export const IDL: Firethree = {
       }
     },
     {
-      name: 'user',
+      name: 'vault',
       type: {
         kind: 'struct',
-        fields: []
+        fields: [
+          {
+            name: 'bump',
+            type: 'u8'
+          },
+          {
+            name: 'authority',
+            type: 'publicKey'
+          },
+          {
+            name: 'name',
+            type: {
+              array: ['u8', 32]
+            }
+          },
+          {
+            name: 'tokenAccount',
+            type: 'publicKey'
+          }
+        ]
+      }
+    },
+    {
+      name: 'vaultDepositor',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'bump',
+            type: 'u8'
+          },
+          {
+            name: 'authority',
+            type: 'publicKey'
+          },
+          {
+            name: 'vault',
+            type: 'publicKey'
+          },
+          {
+            name: 'totalDeposit',
+            type: 'u64'
+          },
+          {
+            name: 'totalWithdrawal',
+            type: 'u64'
+          },
+          {
+            name: 'netDeposit',
+            type: 'i64'
+          },
+          {
+            name: 'lpShares',
+            type: 'u64'
+          }
+        ]
       }
     }
   ],
   types: [
     {
-      name: 'ProjectArgs',
+      name: 'CreateProjectArgs',
       type: {
         kind: 'struct',
         fields: [
@@ -273,6 +620,20 @@ export const IDL: Firethree = {
           }
         ]
       }
+    },
+    {
+      name: 'CreateVaultArgs',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'name',
+            type: {
+              array: ['u8', 32]
+            }
+          }
+        ]
+      }
     }
   ],
   errors: [
@@ -280,6 +641,41 @@ export const IDL: Firethree = {
       code: 6000,
       name: 'UnauthorizedToDeleteProject',
       msg: 'Unauthorized to delete the project'
+    },
+    {
+      code: 6001,
+      name: 'InvalidShadowAccount',
+      msg: 'Invalid shadow account'
+    },
+    {
+      code: 6002,
+      name: 'InvalidAccount',
+      msg: 'Invalid account'
+    },
+    {
+      code: 6003,
+      name: 'Unauthorized',
+      msg: 'Unauthorized access'
+    },
+    {
+      code: 6004,
+      name: 'InvalidPassType',
+      msg: 'Invalid pass type'
+    },
+    {
+      code: 6005,
+      name: 'InvalidVaultDepositorAuthority',
+      msg: 'Invalid vault depositor authority'
+    },
+    {
+      code: 6006,
+      name: 'InvalidOwnerAuthority',
+      msg: 'Invalid owner authority'
+    },
+    {
+      code: 6007,
+      name: 'InvalidMintAddress',
+      msg: 'Invalid mint address'
     }
   ]
 }

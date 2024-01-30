@@ -1,12 +1,12 @@
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
-import { ConfirmOptions, Connection } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 import { Firethree as IFirethree } from './types/firethree'
 import IDL from './idl/firethree.json'
 import { FIRETHREE_PROGRAM_ID } from './constants/program'
-import Analytics from './analytics'
-import Collection from './collection'
-import Storage from './storage'
-import Project from './project'
+import Analytics from './project/analytics'
+import Collection from './project/collection'
+import Storage from './project/storage'
+import Project from './project/project'
 import { ShdwDrive } from '@shadow-drive/sdk'
 
 export default class Firethree {
@@ -18,13 +18,15 @@ export default class Firethree {
   provider: AnchorProvider
   connection: Connection
   wallet: Wallet
-  opts: ConfirmOptions
 
-  constructor(connection: Connection, wallet?: Wallet, opts?: ConfirmOptions) {
+  constructor(connection: Connection, wallet?: Wallet) {
     this.connection = connection
     this.wallet = wallet
-    this.opts = opts || AnchorProvider.defaultOptions()
-    this.provider = new AnchorProvider(this.connection, this.wallet, this.opts)
+    this.provider = new AnchorProvider(
+      this.connection,
+      this.wallet,
+      AnchorProvider.defaultOptions()
+    )
     this.program = new Program<IFirethree>(
       IDL as IFirethree,
       FIRETHREE_PROGRAM_ID,
