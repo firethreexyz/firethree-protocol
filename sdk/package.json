@@ -1,7 +1,7 @@
 {
-  "name": "@firethreexyz/firethree-protocol",
-  "version": "0.18.7",
-  "description": "The official firethree. Create your own solona dApp with collection, storage, analytics with this protocol using shadow drive!",
+  "name": "@triadxyz/firethree-protocol",
+  "version": "0.0.2",
+  "description": "The official firethree. Create your own solona dApp and build on the best of SocialFI products!",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -36,11 +36,8 @@
     "GenesysGO shadow drive",
     "vaults"
   ],
-  "author": "Firethree",
+  "author": "Triad",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/firethreexyz/firethree-protocol/issues"
-  },
   "homepage": "https://firethree.xyz",
   "dependencies": {
     "@coral-xyz/anchor": "0.28.0",

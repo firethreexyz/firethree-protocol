@@ -1,4 +1,4 @@
-import { FIRETHREE_PROGRAM_ID } from './../constants/program'
+import { FIRETHREE_PROGRAM_ID } from '../constants/program'
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import {
   Connection,
@@ -7,7 +7,7 @@ import {
   TransactionMessage,
   VersionedTransaction
 } from '@solana/web3.js'
-import { IDL, Firethree } from './../types/firethree'
+import { IDL, Firethree } from '../types/firethree'
 import { decodeName, encodeName } from '../utils/name'
 import {
   getVaultAddressSync,

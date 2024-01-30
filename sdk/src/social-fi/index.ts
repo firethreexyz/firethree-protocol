@@ -1,9 +1,9 @@
-import { FIRETHREE_PROGRAM_ID } from './../constants/program'
+import { FIRETHREE_PROGRAM_ID } from '../constants/program'
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { Connection } from '@solana/web3.js'
-import { IDL, Firethree } from './../types/firethree'
+import { IDL, Firethree } from '../types/firethree'
 
-export class socialFi {
+export default class SocialFi {
   program: Program<Firethree>
   provider: AnchorProvider
   connection: Connection
