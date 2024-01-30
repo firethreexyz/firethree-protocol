@@ -2,7 +2,9 @@
   <h1>Firethree</h1>
 </div>
 
-Create your own Solana dApp with collection, storage, analytics with this protocol. storaged by @GenesysGo!
+The official firethree. Create your own solona dApp and build on the best of SocialFI products! Powered By @GenesysGO and @pyth!
+
+**collection, documents, storage, analytics, vaults**
 
 ### Docs
 https://firethreexyz.github.io/firethree-protocol/
