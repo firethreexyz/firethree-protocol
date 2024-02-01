@@ -4,6 +4,7 @@ import { Connection } from '@solana/web3.js'
 import { IDL, Firethree } from '../types/firethree'
 import Vault from './vault'
 import PriceAlert from './price-alert'
+import Project from './../project'
 
 export default class Defi {
   program: Program<Firethree>
@@ -13,7 +14,7 @@ export default class Defi {
   vault: Vault
   priceAlert: PriceAlert
 
-  constructor(connection: Connection, wallet?: Wallet) {
+  constructor(connection: Connection, wallet: Wallet, project: Project) {
     this.connection = connection
     this.wallet = wallet
     this.provider = new AnchorProvider(
@@ -27,6 +28,6 @@ export default class Defi {
       this.provider
     )
     this.vault = new Vault(this.connection, this.wallet)
-    this.priceAlert = new PriceAlert(this.connection, this.wallet)
+    this.priceAlert = new PriceAlert(this.connection, project)
   }
 }
