@@ -1,4 +1,4 @@
-import SocialFi from './social-fi'
+import Defi from './defi'
 import Project from './project'
 
-export { SocialFi, Project }
+export { Defi, Project }

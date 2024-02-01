@@ -5,7 +5,7 @@ import { IDL, Firethree } from '../types/firethree'
 import Vault from './vault'
 import PriceAlert from './price-alert'
 
-export default class SocialFi {
+export default class Defi {
   program: Program<Firethree>
   provider: AnchorProvider
   connection: Connection
