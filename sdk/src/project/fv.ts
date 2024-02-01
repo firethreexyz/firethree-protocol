@@ -38,6 +38,11 @@ export default class Fv {
     return response.data
   }
 
+  /**
+   * Get a cache
+   * @param key Key of the cache
+   *
+   */
   public async get<T>(key: string): Promise<T | null> {
     const response = (await this.getDoc(key)) as {
       data: string
