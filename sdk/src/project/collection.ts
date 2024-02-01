@@ -153,27 +153,21 @@ export default class Collection {
 
   /**
    * Add a new document to a collection
-   * @param name Collection name (e.g. 'posts')
+   * @param collection Collection name (e.g. 'posts')
    * @param data Data to add to the collection
    *
    */
-  public async addDoc<T>({ name, data }: { name: string; data: T }) {
-    let prefixes = name.split('.')
-    let newPrefixes = []
-
-    prefixes.forEach((prefix) => {
-      if (UUID.validate(prefix)) {
-        newPrefixes.push('id')
-
-        return
-      }
-
-      newPrefixes.push(prefix)
-    })
-
-    const collectionPrefix = newPrefixes.join('.')
+  public async addDoc<T>({
+    collection,
+    id,
+    data
+  }: {
+    collection: string
+    id: string
+    data: T
+  }) {
     const collectionResponse: AxiosResponse<T> = await GENESYS_API.get(
-      `/${this.project.shdw}/collection-${collectionPrefix}.json`
+      `/${this.project.shdw}/collection-${collection}.json`
     )
 
     if (!collectionResponse.data) {
@@ -184,24 +178,23 @@ export default class Collection {
 
     const doc = {
       ...data,
-      id: UUID.v4()
+      id: id || UUID.v4()
     }
+    const filename = `doc-${collection}.${doc.id}.json`
 
     const isValidCollection = verifyCollection(collectionResponse.data, doc)
 
     if (!isValidCollection) return
 
-    let docReponse
+    const hasColletion = await this.getDoc({ collection, id: doc.id })
 
-    try {
-      docReponse = await GENESYS_API.get(
-        `/${this.project.shdw}/doc-${name}.json`
-      )
-    } catch (error) {}
+    if (hasColletion) {
+      throw new Error('Document already exists')
+    }
 
     const uploadFileResponse = await this.shdwDrive.uploadFile(
       new PublicKey(this.project.shdw),
-      new File([JSON.stringify(doc)], `doc-${name}.${doc.id}.json`, {
+      new File([JSON.stringify(doc)], `${filename}`, {
         type: 'application/json'
       })
     )
@@ -210,50 +203,30 @@ export default class Collection {
       throw new Error('Error to create new document')
     }
 
-    if (docReponse) {
-      await this.shdwDrive.editFile(
-        new PublicKey(this.project.shdw),
-        `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
-        new File(
-          [JSON.stringify([...docReponse.data, doc.id])],
-          `doc-${name}.json`,
-          {
-            type: 'application/json'
-          }
-        )
-      )
-    }
-
-    if (!docReponse) {
-      await this.shdwDrive.uploadFile(
-        new PublicKey(this.project.shdw),
-        new File([JSON.stringify([doc.id])], `doc-${name}.json`, {
-          type: 'application/json'
-        })
-      )
-    }
-
     return {
       message: 'Document created successfully',
       doc,
       fileUrl: {
-        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`,
-        doc: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
-        docId: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${doc.id}.json`
+        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${collection}.json`,
+        doc: `${GENESYSGO_URL}/${this.project.shdw}/${filename}`
       }
     }
   }
 
   /**
    * Get a document from a collection
-   * @param name Collection name (e.g. 'posts')
+   * @param collection Collection name (e.g. 'posts')
    * @param id ID of the document to get if you want to get from a subcollection use (e.g. '1234.likes') or just (e.g. '1234') to get from the main collection
    *
    */
-  public async getDoc({ name, id }: { name: string; id: string }) {
+  public async getDoc({ collection, id }: { collection: string; id: string }) {
     const response = await GENESYS_API.get(
-      `/${this.project.shdw}/doc-${name}.${id}.json`
+      `/${this.project.shdw}/doc-${collection}.${id}.json`
     )
+
+    if (!response.data) {
+      return null
+    }
 
     return {
       message: 'Document fetched successfully',
@@ -263,17 +236,17 @@ export default class Collection {
 
   /**
    * Edit a document in a collection
-   * @param name Collection name to set the structure for (e.g. 'posts')
+   * @param collection Collection name to set the structure for (e.g. 'posts')
    * @param id ID of the document to edit
    * @param data New data to merge with the existing data (e.g. { title: "New Title" }) or all old data with the updated fields (e.g. { title: "New Title", body: "New Body" })
    *
    */
   public async editDoc<T>({
-    name,
+    collection,
     id,
     data
   }: {
-    name: string
+    collection: string
     id: string
     data: T
   }) {
@@ -281,22 +254,8 @@ export default class Collection {
       throw new Error('You must provide an ID to edit a document')
     }
 
-    let prefixes = name.split('.')
-    let newPrefixes = []
-
-    prefixes.forEach((prefix) => {
-      if (UUID.validate(prefix)) {
-        newPrefixes.push('id')
-
-        return
-      }
-
-      newPrefixes.push(prefix)
-    })
-
-    const collectionPrefix = newPrefixes.join('.')
     const collectionResponse: AxiosResponse<T> = await GENESYS_API.get(
-      `/${this.project.shdw}/collection-${collectionPrefix}.json`
+      `/${this.project.shdw}/collection-${collection}.json`
     )
 
     if (!collectionResponse.data) {
@@ -309,19 +268,21 @@ export default class Collection {
 
     if (!isValidCollection) return
 
-    const dataReponse = await GENESYS_API.get(
-      `/${this.project.shdw}/doc-${name}.${id}.json`
-    )
+    const dataReponse = await this.getDoc({ collection, id })
+
+    if (!dataReponse) {
+      throw new Error('Document does not exist')
+    }
 
     let doc = {
-      ...dataReponse.data,
+      ...dataReponse.doc,
       ...data
     }
 
     await this.shdwDrive.editFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`,
-      new File([JSON.stringify(doc)], `doc-${name}.${id}.json`, {
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${collection}.${id}.json`,
+      new File([JSON.stringify(doc)], `doc-${collection}.${id}.json`, {
         type: 'application/json'
       })
     )
@@ -330,48 +291,43 @@ export default class Collection {
       message: 'Document updated successfully',
       doc,
       fileUrl: {
-        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${collectionPrefix}.json`,
-        doc: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
-        docId: `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${doc.id}.json`
+        collection: `${GENESYSGO_URL}/${this.project.shdw}/collection-${collection}.json`,
+        doc: `${GENESYSGO_URL}/${this.project.shdw}/doc-${collection}.${doc.id}.json`
       }
     }
   }
 
   /**
    * Delete a document in a collection
-   * @param name Collection name (e.g. 'posts')
+   * @param collection Collection name (e.g. 'posts')
    * @param id ID of the document to delete
    *
    */
-  public async deleteDoc({ name, id }: { name: string; id: string }) {
+  public async deleteDoc({
+    collection,
+    id
+  }: {
+    collection: string
+    id: string
+  }) {
     if (!id) {
       throw new Error('You must provide an ID to delete a document')
     }
 
-    const dataReponse = await GENESYS_API.get(
-      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`
-    )
+    const dataReponse = await this.getDoc({ collection, id })
+
+    if (!dataReponse) {
+      throw new Error('Document does not exist')
+    }
 
     const response = await this.shdwDrive.deleteFile(
       new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.${id}.json`
+      `${GENESYSGO_URL}/${this.project.shdw}/doc-${collection}.${id}.json`
     )
 
     if (!response?.transaction_signature) {
       throw new Error('Error to delete document')
     }
-
-    await this.shdwDrive.editFile(
-      new PublicKey(this.project.shdw),
-      `${GENESYSGO_URL}/${this.project.shdw}/doc-${name}.json`,
-      new File(
-        [JSON.stringify(dataReponse.data.filter((id: string) => id !== id))],
-        `doc-${name}.json`,
-        {
-          type: 'application/json'
-        }
-      )
-    )
 
     return {
       message: response.message || 'Document deleted successfully'
