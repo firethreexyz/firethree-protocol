@@ -6,14 +6,11 @@ import Analytics from './analytics'
 import Collection from './collection'
 import Storage from './storage'
 import { encodeName, decodeName } from '../utils/name'
-import * as multisig from '@sqds/multisig'
-import { Permission, Permissions } from '@sqds/multisig/lib/types'
 import { ShdwDrive, StorageAccountV2 } from '@shadow-drive/sdk'
 import { getProjectPDA } from '../utils/helpers'
 import { GENESYSGO_URL } from '../constants/storage'
 import { Project as IProject } from '../types/project'
 import {
-  Keypair,
   PublicKey,
   TransactionMessage,
   VersionedTransaction
@@ -204,36 +201,8 @@ export default class Project {
       }
     }
 
-    const createKey = new Keypair()
-
-    const [MultisigPda] = multisig.getMultisigPda({
-      createKey: createKey.publicKey
-    })
-
     const { blockhash } =
       await this.program.provider.connection.getLatestBlockhash()
-
-    const membersPermissions = members.map((member) => ({
-      key: member,
-      permissions: Permissions.fromPermissions([Permission.Vote])
-    }))
-
-    const multisigIx = multisig.instructions.multisigCreate({
-      createKey: createKey.publicKey,
-      creator,
-      multisigPda: MultisigPda,
-      configAuthority: null,
-      timeLock: 0,
-      members: [
-        {
-          key: creator,
-          permissions: Permissions.all()
-        },
-        ...membersPermissions
-      ],
-      threshold,
-      memo: name
-    })
 
     let shdw: PublicKey = null
 
@@ -268,14 +237,12 @@ export default class Project {
     const message = new TransactionMessage({
       payerKey: creator,
       recentBlockhash: blockhash,
-      instructions: [multisigIx, setupProjectIx]
+      instructions: [setupProjectIx]
     }).compileToV0Message()
 
     const setupProjecTransactionSigned = await this.wallet.signTransaction(
       new VersionedTransaction(message)
     )
-
-    setupProjecTransactionSigned.sign([createKey])
 
     await this.program.provider.connection.sendRawTransaction(
       setupProjecTransactionSigned.serialize()

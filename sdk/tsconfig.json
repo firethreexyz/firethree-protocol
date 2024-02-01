@@ -14,8 +14,9 @@
       "*": ["./types/*"]
     },
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
-  "exclude": ["__tests__", "src/**/*.spec.ts", "src/**/*.js"]
+  "exclude": ["__tests__", "src/**/*.spec.ts", "src/**/*.js", "node_modules"]
 }
