@@ -1,4 +1,4 @@
-import { Program, Wallet } from '@coral-xyz/anchor'
+import { Program } from '@coral-xyz/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { Firethree } from '../types/firethree'
 import {
@@ -7,7 +7,6 @@ import {
 } from '@pythnetwork/client'
 import { PythVerbosePriceCallback } from '@pythnetwork/client/lib/PythConnection'
 import Project from './../project'
-const UUID = require('uuid')
 
 export default class PriceAlert {
   program: Program<Firethree>

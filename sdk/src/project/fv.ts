@@ -68,7 +68,7 @@ export default class Fv {
    * Create a new redis cache
    * @param key Key of the cache
    * @param data Data to add to the cache
-   * @param expireAt Time in seconds to expire the cache
+   * @param expireAt Time in milliseconds to expire the cache
    *
    */
   public async set<T>(key: string, data: T, expireAt: number) {
