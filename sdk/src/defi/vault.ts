@@ -240,6 +240,60 @@ export default class Vault {
     return this.connection.sendRawTransaction(tx.serialize())
   }
 
+  public async withdraw({
+    vault,
+    amount,
+    mint
+  }: {
+    vault: string
+    amount: string
+    mint: PublicKey
+  }) {
+    const vaultName = encodeName(vault)
+
+    const VaultPDA = getVaultAddressSync(this.program.programId, vaultName)
+
+    const VaultDepositorPDA = getVaultDepositorAddressSync(
+      this.program.programId,
+      VaultPDA,
+      this.wallet.publicKey
+    )
+
+    const VaultTokenAccountPDA = getTokenVaultAddressSync(
+      this.program.programId,
+      VaultPDA
+    )
+
+    const userTokenAccount = await getAssociatedTokenAddress(
+      mint,
+      this.wallet.publicKey
+    )
+
+    const ix = await this.program.methods
+      .withdraw(new BN(amount))
+      .accounts({
+        vaultDepositor: VaultDepositorPDA,
+        vault: VaultPDA,
+        vaultTokenAccount: VaultTokenAccountPDA,
+        userTokenAccount
+      })
+      .instruction()
+
+    const { blockhash } = await this.connection.getLatestBlockhash()
+
+    const message = new TransactionMessage({
+      payerKey: this.wallet.publicKey,
+      recentBlockhash: blockhash,
+      instructions: [ix]
+    }).compileToV0Message()
+
+    let tx = new VersionedTransaction(message)
+
+    tx = await this.wallet.signTransaction(tx)
+
+    return this.connection.sendRawTransaction(tx.serialize())
+  }
+
   public async getHistoryByVaultDepositor() {}
 
   public async getLogsByVault(vaultName: string) {
@@ -274,8 +328,6 @@ export default class Vault {
 
     return charts
   }
-
-  public async withdraw() {}
 
   public async withdrawFees() {}
 }
