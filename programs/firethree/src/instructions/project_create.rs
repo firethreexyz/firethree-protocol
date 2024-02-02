@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 
-use crate::errors::*;
 use crate::state::{CreateProjectArgs, Project};
 
 #[derive(Accounts)]
@@ -25,25 +24,6 @@ pub fn create_project(ctx: Context<CreateProject>, args: CreateProjectArgs) -> R
 
     let clock: Clock = Clock::get().unwrap();
     project.ts = clock.unix_timestamp;
-
-    Ok(())
-}
-
-#[derive(Accounts)]
-pub struct DeleteProject<'info> {
-    #[account(mut)]
-    pub authority: Signer<'info>,
-
-    #[account(mut, close = authority)]
-    pub project: Account<'info, Project>,
-}
-
-pub fn delete_project(ctx: Context<DeleteProject>) -> Result<()> {
-    let project: &mut Account<Project> = &mut ctx.accounts.project;
-
-    if project.authority != *ctx.accounts.authority.key {
-        return Err(FirethreeError::UnauthorizedToDeleteProject.into());
-    }
 
     Ok(())
 }

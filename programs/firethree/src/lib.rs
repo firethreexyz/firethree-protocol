@@ -6,8 +6,8 @@ use state::*;
 mod cpi;
 mod errors;
 mod instructions;
-mod state;
 mod macros;
+mod state;
 
 declare_id!("Fire3T9ABT33UYoVJZwWUnbPR3rgoVw98y82UgHZ8Bm");
 
