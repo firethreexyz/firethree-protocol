@@ -7,6 +7,7 @@ mod cpi;
 mod errors;
 mod instructions;
 mod state;
+mod macros;
 
 declare_id!("Fire3T9ABT33UYoVJZwWUnbPR3rgoVw98y82UgHZ8Bm");
 
@@ -36,5 +37,12 @@ pub mod firethree {
 
     pub fn create_vault_depositor(ctx: Context<CreateVaultDepositor>) -> Result<()> {
         instructions::create_vault_depositor(ctx)
+    }
+
+    pub fn withdraw<'info>(
+        ctx: Context<'_, '_, '_, 'info, Withdraw<'info>>,
+        amount: u64,
+    ) -> Result<()> {
+        instructions::withdraw(ctx, amount)
     }
 }

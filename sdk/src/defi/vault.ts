@@ -43,8 +43,24 @@ export default class Vault {
    * Create a new vault
    *  @param name - The vault's name
    *  @param mint - Token mint for the vault (e.g. USDC)
+   *  @param maxTokens - Maximum number of tokens in the vault
+   *  @param minDepositAmount - Minimum deposit amount
+   *  @param profitShare - Profit share percentage
+   *
    */
-  public async createVault({ name, mint }: { name: string; mint: PublicKey }) {
+  public async createVault({
+    name,
+    mint,
+    maxTokens,
+    minDepositAmount,
+    profitShare
+  }: {
+    name: string
+    mint: PublicKey
+    maxTokens: BN
+    minDepositAmount: BN
+    profitShare: number
+  }) {
     const vaultName = encodeName(name)
 
     const VaultPDA = getVaultAddressSync(this.program.programId, vaultName)
@@ -55,11 +71,13 @@ export default class Vault {
 
     return this.program.methods
       .createVault({
-        name: vaultName
+        name: vaultName,
+        minDepositAmount,
+        maxTokens,
+        profitShare
       })
       .accounts({
         signer: this.wallet.publicKey,
-        triadSigner: this.wallet.publicKey,
         vault: VaultPDA,
         tokenAccount: TokenAccountPDA,
         payerTokenMint: mint
@@ -128,10 +146,11 @@ export default class Vault {
         authority: depositor.authority.toBase58(),
         vault: depositor.vault.toBase58(),
         bump: depositor.bump,
-        totalDeposit: formatNumber(depositor.totalDeposit),
-        totalWithdrawal: formatNumber(depositor.totalWithdrawal),
+        totalDeposit: formatNumber(depositor.totalDeposits),
+        totalWithdraws: formatNumber(depositor.totalWithdraws),
         lpShares: formatNumber(depositor.lpShares),
-        netDeposit: formatNumber(depositor.netDeposit)
+        netDeposits: formatNumber(depositor.netDeposits),
+        netWithdraws: formatNumber(depositor.netWithdraws)
       }
     } catch (e) {
       throw new Error(e)
@@ -157,7 +176,7 @@ export default class Vault {
 
     const VaultPDA = getVaultAddressSync(this.program.programId, vaultName)
 
-    const DepositorPDA = getVaultDepositorAddressSync(
+    const VaultDepositorPDA = getVaultDepositorAddressSync(
       this.program.programId,
       VaultPDA,
       this.wallet.publicKey
@@ -165,7 +184,7 @@ export default class Vault {
 
     let hasDepositor = true
     try {
-      await this.program.account.vaultDepositor.fetch(DepositorPDA)
+      await this.program.account.vaultDepositor.fetch(VaultDepositorPDA)
     } catch {
       hasDepositor = false
     }
@@ -177,7 +196,7 @@ export default class Vault {
         .createVaultDepositor()
         .accounts({
           vault: VaultPDA,
-          vaultDepositor: DepositorPDA
+          vaultDepositor: VaultDepositorPDA
         })
         .instruction()
 
@@ -197,7 +216,7 @@ export default class Vault {
     const depositIx = await this.program.methods
       .deposit(new BN(amount))
       .accounts({
-        depositor: DepositorPDA,
+        vaultDepositor: VaultDepositorPDA,
         vault: VaultPDA,
         vaultTokenAccount: VaultTokenAccountPDA,
         userTokenAccount

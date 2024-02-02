@@ -25,4 +25,16 @@ pub enum FirethreeError {
 
     #[msg("Invalid mint address")]
     InvalidMintAddress,
+
+    #[msg("Invalid Max Tokens")]
+    InvalidMaxTokens,
+
+    #[msg("Invalid Profit Share")]
+    InvalidProfitShare,
+
+    #[msg("Invalid Deposit Amount")]
+    InvalidDepositAmount,
+
+    #[msg("Invalid Withdraw Amount")]
+    InvalidWithdrawAmount,
 }
