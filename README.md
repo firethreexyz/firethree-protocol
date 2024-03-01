@@ -2,9 +2,9 @@
   <h1>Firethree Protocol</h1>
 </div>
 
-The official Firethree. Create your own solana dApp and build on the best of socialFI products!! Powered By @GenesysGO and @pyth.
+The official Firethree. Create your own solana dApp and build the best products!! Powered By @GenesysGO.
 
-**collection, documents, storage, analytics, vaults**
+**collection, documents, storage, analytics**
 
 ### Docs
 [https://firethreexyz.github.io/firethree-protocol/](https://docs.firethree.xyz/)

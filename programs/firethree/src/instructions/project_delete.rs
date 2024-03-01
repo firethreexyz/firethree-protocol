@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 
+use crate::constraints::is_authority_for_project;
 use crate::errors::*;
 use crate::state::Project;
 
@@ -8,7 +9,7 @@ pub struct DeleteProject<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(mut, close = authority)]
+    #[account(mut, close = authority, constraint = is_authority_for_project(&project, &authority)?)]
     pub project: Account<'info, Project>,
 }
 

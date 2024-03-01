@@ -13,28 +13,4 @@ pub enum FirethreeError {
 
     #[msg("Unauthorized access")]
     Unauthorized,
-
-    #[msg("Invalid pass type")]
-    InvalidPassType,
-
-    #[msg("Invalid vault depositor authority")]
-    InvalidVaultDepositorAuthority,
-
-    #[msg("Invalid owner authority")]
-    InvalidOwnerAuthority,
-
-    #[msg("Invalid mint address")]
-    InvalidMintAddress,
-
-    #[msg("Invalid Max Tokens")]
-    InvalidMaxTokens,
-
-    #[msg("Invalid Profit Share")]
-    InvalidProfitShare,
-
-    #[msg("Invalid Deposit Amount")]
-    InvalidDepositAmount,
-
-    #[msg("Invalid Withdraw Amount")]
-    InvalidWithdrawAmount,
 }
