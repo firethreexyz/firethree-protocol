@@ -2,14 +2,14 @@
 seeds = false
 skip-lint = false
 
-[programs.devnet]
+[programs.mainnet]
 firethree = "Fire3T9ABT33UYoVJZwWUnbPR3rgoVw98y82UgHZ8Bm"
 
 [registry]
-url = "https://api.devnet.solana.com"
+url = "https://api.mainnet-beta.solana.com"
 
 [provider]
-cluster = "devnet"
+cluster = "mainnet"
 wallet = "/Users/dannpl/.config/solana/id.json"
 
 [scripts]

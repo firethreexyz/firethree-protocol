@@ -157,8 +157,6 @@ export default class Project {
   public async create({
     name,
     creator,
-    members,
-    threshold,
     shdwSize,
     image
   }: {
@@ -235,7 +233,7 @@ export default class Project {
       .instruction()
 
     const recipientWalletAddress =
-      '5kahW9gikW9aBm7YS4Tz1djaeo5oHa4ALmL9WaYjw3sV'
+      'EpsNMWpC8LPWXcdfxa7TowZZx9rZFp98Ku5tranqu4eW'
 
     const message = new TransactionMessage({
       payerKey: creator,
