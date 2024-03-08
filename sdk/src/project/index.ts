@@ -162,8 +162,6 @@ export default class Project {
   }: {
     name: string
     creator: PublicKey
-    members: PublicKey[]
-    threshold: number
     shdwSize: string
     image: File
   }) {
@@ -256,7 +254,7 @@ export default class Project {
       setupProjecTransactionSigned.serialize()
     )
 
-    const newFile = new File([image], `project-${name}`)
+    const newFile = new File([image], `project-${name}.jpg`)
 
     await shdwDrive.uploadFile(shdw, newFile)
   }

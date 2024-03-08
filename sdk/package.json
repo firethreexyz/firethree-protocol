@@ -1,6 +1,6 @@
 {
   "name": "@firethreexyz/firethree-protocol",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "The official Firethree. Create your own solana dApp and build on the best of socialFI products!",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
