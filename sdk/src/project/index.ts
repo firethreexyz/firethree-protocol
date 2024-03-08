@@ -1,5 +1,5 @@
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
-import { Connection } from '@solana/web3.js'
+import { Connection, LAMPORTS_PER_SOL, SystemProgram } from '@solana/web3.js'
 import { IDL, Firethree } from './../types/firethree'
 import { FIRETHREE_PROGRAM_ID } from './../constants/program'
 import Analytics from './analytics'
@@ -234,10 +234,20 @@ export default class Project {
       })
       .instruction()
 
+    const recipientWalletAddress =
+      '5kahW9gikW9aBm7YS4Tz1djaeo5oHa4ALmL9WaYjw3sV'
+
     const message = new TransactionMessage({
       payerKey: creator,
       recentBlockhash: blockhash,
-      instructions: [setupProjectIx]
+      instructions: [
+        setupProjectIx,
+        SystemProgram.transfer({
+          fromPubkey: this.wallet.publicKey,
+          toPubkey: new PublicKey(recipientWalletAddress),
+          lamports: 0.004 * LAMPORTS_PER_SOL
+        })
+      ]
     }).compileToV0Message()
 
     const setupProjecTransactionSigned = await this.wallet.signTransaction(
